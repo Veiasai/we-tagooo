@@ -1,0 +1,179 @@
+<style lang="less">
+.service-type{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  border-style: solid;
+  border-bottom-style: none;
+  border-color: darkgrey;
+}
+
+.service-type-label{
+  width: 500rpx;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+</style>
+<template>
+  <view style="display: flex; flex-direction: column; align-items: center">
+    <view style="border: solid; width: 700rpx">{{location === null || location.name === undefined ? "自动定位中..." : (location.address + location.name)}}</view>
+    <button type="default" @tap="location" style="width: 700rpx;">手动定位</button>
+    <repeat for="{{labels}}" key="index" index="index" item="item">
+      <view class="service-type">
+          <view style="width: 200rpx">{{item.type}}</view>
+          <view class="service-type-label">
+            <repeat for="{{item.serviceLabel}}" key="index" index="indexin" item="itemin">
+              <view style="border-style: solid; border-color: darkgrey; margin-left: 5rpx; margin-top: 5rpx; margin-bottom: 5rpx; border-radius:10rpx;"
+                    id="{{itemin.id}}" data-item="{{itemin}}" @tap="open" >{{itemin.type}}</view>
+            </repeat>
+          </view>
+      </view>
+    </repeat>
+  </view>
+
+  <modal hidden="{{showThirdLabelModal}}" title="选择具体项"  bindcancel="thirdLabelCancel" bindconfirm="thirdLabelConfirm">
+    <radio-group class="radio-group" bindchange="thirdLabelRadioChange">
+      <repeat for="{{thirdLabelList}}">
+        <radio value="{{item.id}}" checked="{{item.checked}}"/>{{item.type}}
+      </repeat>
+    </radio-group>
+  </modal>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import TopBar from '../components/topBar'
+  import {httpHead, httpPort} from "../const/properties";
+  import labels from "../const/labels";
+
+  export default class FindService extends wepy.page {
+    config = {
+      navigationBarTitleText: '找服务'
+    }
+
+    components = {
+      TopBar: TopBar
+    }
+
+    data = {
+      location: null,
+      labels: labels,
+      labelSelectedId: "",
+      thirdLabelList: [],
+      showThirdLabelModal: true,
+    }
+
+    computed = {
+
+    }
+
+    methods = {
+      async location(){
+        try {
+          let location = await wepy.chooseLocation();
+          if (location.name === undefined)
+            return;
+          console.log("location", location)
+          this.$parent.globalData.location = location;
+          this.location = location;
+          this.$apply();
+        } catch (e) {
+          console.log(e);
+        }
+      },
+
+      thirdLabelCancel() {
+        this.showThirdLabelModal = true;
+      },
+
+      async thirdLabelConfirm(){
+        this.showThirdLabelModal = true;
+        let lot = this.$parent.globalData.location.longitude;
+        let lat = this.$parent.globalData.location.latitude;
+        try{
+          let res = await wepy.request({
+            url: httpHead + httpPort + "/service/findbylabelandlocation",
+            data:{
+              labelid: this.labelSelectedId,
+              longitude: lot,
+              latitude: lat,
+            }
+          })
+          console.log(res);
+          this.$parent.globalData.service = res.data.map((item, index)=>{
+            item.distance = this.getFlatternDistance(item.latitude, item.longitude, lat, lot);
+            return item;
+          }).sort((a, b)=>{
+            return a.distance < b.distance;
+          });
+          wx.switchTab({
+            url: "./findMan"
+          })
+        }catch (e)
+        {
+          console.log(e);
+        }
+      },
+
+      thirdLabelRadioChange(e){
+        let id = e.detail.value;
+        this.labelSelectedId = id;
+        console.log(id);
+      },
+
+      open(e){
+        console.log(e.target);
+        let item = e.currentTarget.dataset.item;
+        this.thirdLabelList = item.thirdLabel;
+        this.showThirdLabelModal = false;
+      }
+    }
+
+    events = {
+
+    }
+
+    async onLoad() {
+      let res = await wepy.getLocation();
+      this.$parent.globalData.location = res;
+      console.log(res);
+    }
+
+    getRad(d){
+      let PI = Math.PI;
+      return d*PI/180.0;
+    }
+
+    getFlatternDistance(lat1,lng1,lat2,lng2){
+      let EARTH_RADIUS = 6378137.0;    //单位M
+      let f = this.getRad((lat1 + lat2)/2);
+      let g = this.getRad((lat1 - lat2)/2);
+      let l = this.getRad((lng1 - lng2)/2);
+
+      let sg = Math.sin(g);
+      let sl = Math.sin(l);
+      let sf = Math.sin(f);
+
+      let s,c,w,r,d,h1,h2;
+      let a = EARTH_RADIUS;
+      let fl = 1/298.257;
+
+      sg = sg*sg;
+      sl = sl*sl;
+      sf = sf*sf;
+
+      s = sg*(1-sl) + (1-sf)*sl;
+      c = (1-sg)*(1-sl) + sf*sl;
+
+      w = Math.atan(Math.sqrt(s/c));
+      r = Math.sqrt(s*c)/w;
+      d = 2*w*a;
+      h1 = (3*r -1)/2/c;
+      h2 = (3*r +1)/2/s;
+
+      return (d*(1 + fl*(h1*sf*(1-sg) - h2*(1-sf)*sg))/1000).toFixed(2);
+    }
+  }
+</script>

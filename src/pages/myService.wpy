@@ -1,0 +1,63 @@
+<style lang="less">
+
+</style>
+<template>
+  <view>
+    <button @tap="bindPhone">绑定手机</button>
+    <view>
+      <view>
+        任务栏
+      </view>
+    </view>
+    <view @tap="newPublish">发布新广告</view>
+  </view>
+
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import {httpHead, httpPort} from "../const/properties";
+
+  export default class MyService extends wepy.page {
+    config = {
+      navigationBarTitleText: '我提供的服务'
+    }
+
+    components = {
+
+    }
+
+
+    data = {
+
+    }
+
+    computed = {
+
+    }
+
+    methods = {
+      bindPhone(){
+        wepy.navigateTo({
+          url: "bindPhone"
+        })
+      },
+      newPublish(){
+        if (!this.$parent.checkUserState(2)) {
+          return;
+        }
+        wepy.navigateTo({
+          url: "newPublish"
+        })
+      }
+    }
+
+    events = {
+
+    }
+
+    onLoad() {
+
+    }
+  }
+</script>

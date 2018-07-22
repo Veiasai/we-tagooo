@@ -1,0 +1,42 @@
+<style lang="less">
+.topBar{
+  display: flex;
+  flex-direction: row;
+}
+
+</style>
+<template>
+  <view class="topBar" style="border: solid;">
+    <view @tap="login" style="height: 100rpx;" >登录</view>
+    <image src="../resources/icons/setting.png" @tap="set" style="height: 100rpx; width: 100rpx; margin-left: 500rpx" />
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+
+  export default class TopBar extends wepy.component {
+    data = {
+
+    }
+
+    computed = {
+
+    }
+
+    methods = {
+        login(){
+          this.$emit("login");
+        },
+
+        set(){
+
+        }
+    }
+
+    events = {
+
+    }
+
+  }
+</script>

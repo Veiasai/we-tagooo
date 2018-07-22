@@ -1,0 +1,139 @@
+<style lang="less">
+  @import './resources/weui.wxss';
+
+</style>
+
+<script>
+  import wepy from 'wepy'
+  import 'wepy-async-function'
+  import {httpPort, httpHead} from './const/properties'
+
+  export default class extends wepy.app {
+    config = {
+      pages: [
+        'pages/myService',
+        'pages/findService',
+        'pages/findMan',
+        'pages/followMan',
+
+        'pages/bindPhone',
+        'pages/serviceInfo',
+        'pages/newPublish',
+      ],
+      window: {
+        backgroundTextStyle: 'light',
+        navigationBarBackgroundColor: '#fff',
+        navigationBarTitleText: 'WeChat',
+        navigationBarTextStyle: 'black'
+      },
+
+      tabBar: {
+        "color": "#a9b7b7",
+        "selectedColor": "#9bc1df",
+        "borderStyle": "white",
+        "list": [{
+          "selectedIconPath": "./resources/icons/searchS.png",
+          "iconPath": "./resources/icons/search.png",
+          "pagePath": "pages/findService",
+          "text": "找服务"
+        },
+          {
+            "selectedIconPath": "./resources/icons/teamS.png",
+            "iconPath": "./resources/icons/team.png",
+            "pagePath": "pages/findMan",
+            "text": "找到的人"
+          },
+          {
+            "selectedIconPath": "./resources/icons/heartS.png",
+            "iconPath": "./resources/icons/heart.png",
+            "pagePath": "pages/followMan",
+            "text": "关注的人"
+          },
+          {
+            "selectedIconPath": "./resources/icons/userS.png",
+            "iconPath": "./resources/icons/user.png",
+            "pagePath": "pages/myService",
+            "text": "我提供服务"
+          }
+        ]
+      }
+    }
+
+    globalData = {
+      location: null,
+      service: null,
+      userId: null,
+      // 0 未登录， 1 未绑定手机号， 2 成功获取UserId
+      userState: 2,
+    }
+
+    constructor() {
+      super();
+      this.use('requestfix');
+      this.use('promisify');
+    }
+
+    onLaunch() {
+
+    }
+
+    // 通用方法
+    checkUserState(state) {
+      if (this.globalData.userState === state)
+        return true;
+      if (this.globalData.userState === 0) {
+        wx.showToast({
+          title: '用户未登录',
+          icon: 'none'
+        })
+      }
+      else if (this.globalData.userState === 1) {
+        wx.showToast({
+          title: '用户未绑定手机号',
+          icon: 'none'
+        })
+      }
+      return false;
+    }
+
+    async follow() {
+      try {
+        let res = await wepy.request({
+          url: httpHead + httpPort + "/interact/follow",
+          method: "POST",
+          data: {
+            "address": "string",
+            "distance": 0,
+            "latitude": 0,
+            "longitude": 0,
+            "serviceId": "string",
+            "userId": "string"
+          }
+        })
+      }catch (e)
+      {
+
+      }
+    }
+
+    async followRemove() {
+      try {
+        let res = await wepy.request({
+          url: httpHead + httpPort + "/interact/follow/remove",
+          method: "POST",
+          data: {
+            "address": "string",
+            "distance": 0,
+            "latitude": 0,
+            "longitude": 0,
+            "serviceId": "string",
+            "userId": "string"
+          }
+        })
+      }catch (e)
+      {
+
+      }
+    }
+  }
+</script>

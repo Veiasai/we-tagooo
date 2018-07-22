@@ -1,0 +1,43 @@
+<style lang="less">
+
+</style>
+<template>
+  <view style="display: flex; flex-direction: column; align-items: center">
+    <view>注册</view>
+  </view>
+
+</template>
+
+<script>
+  import wepy from 'wepy'
+
+  export default class BindPhone extends wepy.page {
+    config = {
+      navigationBarTitleText: '绑定手机'
+    }
+
+    components = {
+
+    }
+
+    data = {
+
+    }
+
+    computed = {
+
+    }
+
+    methods = {
+
+    }
+
+    events = {
+
+    }
+
+    onLoad() {
+
+    }
+  }
+</script>

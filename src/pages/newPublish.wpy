@@ -1,0 +1,112 @@
+<style lang="less">
+
+</style>
+<template>
+  <form bindsubmit="formSubmit" bindreset="formReset">
+    <view style="height: 20vh">
+      <image>
+
+      </image>
+    </view>
+    <view style="background-color: azure; margin-top: 10rpx">
+      <input name="userName" placeholder="我的名字"/>
+    </view>
+    <view style="background-color: azure; margin-top: 10rpx">
+      <input name="title" placeholder="服务广告标题" maxlength="20"/>
+    </view>
+    <view style="background-color: azure; height: 30vh; margin-top: 10rpx">
+      <textarea name="slogan" placeholder="服务广告详情"/>
+    </view>
+    <view @tap="chooseLocation" style="background-color: azure; margin-top: 10rpx; display: flex; flex-direction: row; align-items: center">
+      <image src="../resources/icons/icon-location.png"  mode="scaleToFill" style="width: 100rpx; height: 100rpx;">
+      </image>
+      <text>
+        {{address === null ? "自动定位中,点击可手动定位" : (address.address +'\n' + address.name)}}
+      </text>
+    </view>
+    <view style="background-color: azure; display: flex; flex-direction: row; flex-wrap: wrap; margin-top: 10rpx">
+      <repeat for="{{imgArray}}">
+        <image src="{{item}}" mode="scaleToFill" style="margin-left: 10rpx; width: 200rpx; height: 200rpx">
+        </image>
+      </repeat>
+      <image src="../resources/icons/photo-add.png" mode="scaleToFill" @tap="addImg" style="width: 200rpx; height: 200rpx; margin-left: 10rpx">
+      </image>
+    </view>
+    <view style="background-color: azure; margin-top: 10rpx; display: flex; flex-direction: row; font-size: 30rpx">
+      <view>在广告中公开手机号码:{{phone}}</view>
+      <radio-group name="phonenum">
+        <label>
+          <radio value="1"/>
+          是</label>
+        <label>
+          <radio value="0"/>
+          否</label>
+      </radio-group>
+    </view>
+    <view style="margin-top: 10rpx; display: flex; flex-direction: row; align-items: center">
+      <button formType="submit">提交</button>
+      <button formType="reset">重置</button>
+    </view>
+  </form>
+</template>
+
+<script>
+  import wepy from 'wepy'
+
+  export default class BindPhone extends wepy.page {
+    config = {
+      navigationBarTitleText: '发布服务'
+    }
+
+    components = {}
+
+    data = {
+      phone: 18875758585,
+      address: null,
+      imgArray: [],
+    }
+
+    computed = {}
+
+    methods = {
+      formSubmit(e) {
+        console.log('form发生了submit事件，携带数据为：', e.detail.value)
+      },
+      formReset() {
+        console.log('form发生了reset事件')
+        this.imgArray = [];
+        this.address = null;
+      },
+      async addImg() {
+        try {
+          let res = await wepy.chooseImage({
+            count: 6, // 默认9
+            sizeType: ['compressed'], // 可以指定是原图还是压缩图，默认二者都有
+            sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
+          })
+
+          this.imgArray.push(...res.tempFilePaths);
+          this.$apply();
+        } catch (e) {
+          console.log(e);
+        }
+      },
+      async chooseLocation(){
+        try{
+          let res = await wepy.chooseLocation();
+          console.log(res);
+          this.address = res;
+          this.$apply();
+        }catch (e){
+          console.log(e);
+        }
+      }
+    }
+
+    events = {}
+
+    onLoad() {
+
+    }
+  }
+</script>

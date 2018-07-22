@@ -1,0 +1,71 @@
+<style lang="less">
+
+</style>
+<template>
+  <view style="display: flex; flex-direction: column; align-items: left; margin-left: 25rpx; width: 700rpx">
+    <view style="font-size: 30rpx">{{service.basicLabelName}}-{{service.thirdLabelName}}</view>
+    <view style="display: flex; flex-direction: row; background-color: aliceblue; margin-top: 20rpx; ">
+      <image src="" style="width: 125rpx; height: 125rpx"></image>
+      <view style="width: 425rpx; display: flex; flex-direction: column; align-items: left">
+        <view style="font-size: 25rpx">电话：{{service.phonenum ? service.phone : "未公开"}}</view>
+        <view style="font-size: 25rpx">地址：{{service.address}}</view>
+      </view>
+      <view style="width: 150rpx; display: flex; flex-direction:column; align-items: right">
+        <view style="font-size: 27rpx">{{service.distance}}千米</view>
+        <view style="font-size: 27rpx;">{{service.certification ? '工商户认证' : '未认证'}}</view>
+        <view @tap="follow" style="display: flex; align-items: center">
+          <view style="font-size: 27rpx;">关注</view>
+          <image
+            mode="aspectFit"
+            style="width: 40rpx; height: 38rpx"
+            src="{{item.follow ? '../resources/icons/follow-2.png' : '../resources/icons/follow-1.png'}}"></image>
+        </view>
+      </view>
+    </view>
+    <scroll-view scroll-y style="height: 45vh; background-color: aliceblue; margin-top: 25rpx">
+        <view style="font-size: 30rpx">{{service.title}}</view>
+        <view style="font-size: 30rpx">{{service.slogan}}</view>
+    </scroll-view>
+    <view style="width:100%; font-size: 30rpx; background-color: aliceblue; margin-top: 25rpx">发布日期：{{service.datetime}}</view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import {httpHead, httpPort} from "../const/properties";
+
+  export default class ServiceInfo extends wepy.page {
+    config = {
+      navigationBarTitleText: '服务详情'
+    }
+
+    components = {
+
+    }
+
+    data = {
+      service: null,
+      index: -1,
+    }
+
+    computed = {
+
+    }
+
+    methods = {
+      follow(){
+        try{
+        }
+      }
+    }
+
+    events = {
+
+    }
+
+    onLoad(param, data) {
+        this.service = data.preload.service;
+        this.index = data.preload.index;
+    }
+  }
+</script>
