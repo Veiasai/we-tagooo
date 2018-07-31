@@ -2,14 +2,28 @@
 
 </style>
 <template>
-  <view>
-    <button @tap="bindPhone">绑定手机</button>
-    <view>
-      <view>
-        任务栏
-      </view>
+  <view style="text-align: center">
+    <view style="display: flex; flex-direction: row; ">
+      <view style="border: solid; width: 375rpx; border-radius: 10rpx; border-color: aliceblue" @tap="bindPhone">绑定手机</view>
+      <view style="border: solid; width: 375rpx; border-radius: 10rpx; border-color: aliceblue" @tap="newPublish">发布新广告</view>
     </view>
-    <view @tap="newPublish">发布新广告</view>
+    <view>
+      我发布的服务
+    </view>
+    <repeat for="{{services}}">
+      <view
+        data-service="{{item}}" data-index="{{index}}"
+        style="display: flex; flex-direction: row; background-color: aliceblue; margin-top: 20rpx; margin-left: 25rpx; width: 700rpx;">
+        <image src="" style="width: 125rpx; height: 125rpx"></image>
+        <view style="width: 425rpx; align-items: left">
+          <view style="font-size: 30rpx">{{item.title}}</view>
+        </view>
+        <view style="width: 150rpx; display: flex; flex-direction:column; align-items: right">
+          <view style="border: solid; border-radius: 10rpx; border-color: aliceblue; font-size:30rpx" @tap="updateService">修改广告</view>
+          <view style="border: solid; border-radius: 10rpx; border-color: aliceblue; font-size:30rpx" @tap="deleteService">删除广告</view>
+        </view>
+      </view>
+    </repeat>
   </view>
 
 </template>
@@ -27,9 +41,8 @@
 
     }
 
-
     data = {
-
+      services: [],
     }
 
     computed = {
@@ -49,6 +62,12 @@
         wepy.navigateTo({
           url: "newPublish"
         })
+      },
+      updateService(){
+
+      },
+      deleteService(){
+
       }
     }
 
@@ -56,8 +75,26 @@
 
     }
 
-    onLoad() {
+    onShow() {
+      if (!this.$parent.checkUserState(2)) {
+        return;
+      }
+      this.findUserService(this.$parent.globalData.user.id);
+    }
 
+    async findUserService(id){
+      try{
+        let res = await wepy.request({
+          url: httpHead + httpPort + "/interact/findByPublishUserId",
+          data:{
+            userId: id
+          }
+        })
+        console.log(res.data);
+        this.services = res.data.serviceinfoDTOList;
+      }catch (e){
+
+      }
     }
   }
 </script>

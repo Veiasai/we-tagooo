@@ -1,0 +1,62 @@
+version: '3'
+
+services:
+  eureka:
+    image: bywind/eureka-server:0.0.1-SNAPSHOT 
+    ports:
+      - "8081:8081"
+      - "3307:3306"
+      - "8761:8761"
+    environment:
+      - JVM_OPTS=-Xmx512M -Xms128M
+   
+  mysql:
+    image: mysql:5.7
+    network_mode: "service:eureka"
+    volumes:
+       - db-data:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+
+  user-service :
+    image: bywind/user-service:0.0.1-SNAPSHOT 
+    network_mode: "service:eureka"
+    depends_on: [eureka, mysql]
+    environment:
+      - JVM_OPTS=-Xmx512M -Xms128M
+
+  interact-service :
+    image: bywind/interact-service:0.0.1-SNAPSHOT 
+    network_mode: "service:eureka"
+    depends_on: [eureka, mysql]
+    environment:
+      - JVM_OPTS=-Xmx512M -Xms128M
+
+  admin-server :
+    image: bywind/admin-server:0.0.1-SNAPSHOT 
+    network_mode: "service:eureka"
+    depends_on: [eureka, mysql]
+    environment:
+      - JVM_OPTS=-Xmx512M -Xms128M
+
+  service-service :
+    image: bywind/service-service:0.0.1-SNAPSHOT 
+    network_mode: "service:eureka"
+    depends_on: [eureka, mysql]
+    environment:
+      - JVM_OPTS=-Xmx512M -Xms128M
+
+  gateway :
+    image: bywind/gateway:0.0.1-SNAPSHOT 
+    network_mode: "service:eureka"
+    depends_on: [eureka, mysql]
+    environment:
+      - JVM_OPTS=-Xmx512M -Xms128M
+    
+volumes:
+  db-data:
+
+  
+  
+  
+

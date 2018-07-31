@@ -3,13 +3,11 @@
 </style>
 <template>
   <form bindsubmit="formSubmit" bindreset="formReset">
-    <view style="height: 20vh">
-      <image>
-
-      </image>
-    </view>
     <view style="background-color: azure; margin-top: 10rpx">
       <input name="userName" placeholder="我的名字"/>
+    </view>
+    <view style="background-color: azure; margin-top: 10rpx; font-size: 35rpx" @tap="selectLabel">
+      {{label === null ? "请选择服务类别" : label.type}}
     </view>
     <view style="background-color: azure; margin-top: 10rpx">
       <input name="title" placeholder="服务广告标题" maxlength="20"/>
@@ -21,7 +19,7 @@
       <image src="../resources/icons/icon-location.png"  mode="scaleToFill" style="width: 100rpx; height: 100rpx;">
       </image>
       <text>
-        {{address === null ? "自动定位中,点击可手动定位" : (address.address +'\n' + address.name)}}
+        {{address === null ? "请选择位置" : (address.address +'\n' + address.name)}}
       </text>
     </view>
     <view style="background-color: azure; display: flex; flex-direction: row; flex-wrap: wrap; margin-top: 10rpx">
@@ -48,10 +46,27 @@
       <button formType="reset">重置</button>
     </view>
   </form>
+
+  <modal hidden="{{!showThirdLabelModal}}" title="选择具体项"  bindcancel="thirdLabelCancel" bindconfirm="thirdLabelConfirm">
+  <picker-view indicator-style="height: 50px;" style="width: 100%; height: 300px;" value="{{value}}" bindchange="bindChange">
+    <picker-view-column>
+      <view wx:for="{{labels}}" style="line-height: 50px">{{item.type}}</view>
+    </picker-view-column>
+    <picker-view-column>
+      <view wx:for="{{labels[s1].serviceLabel}}" style="line-height: 50px">{{item.type}}</view>
+    </picker-view-column>
+    <picker-view-column>
+      <view wx:for="{{labels[s1].serviceLabel[s2].thirdLabel}}" style="line-height: 50px">{{item.type}}</view>
+    </picker-view-column>
+  </picker-view>
+  </modal>
+
 </template>
 
 <script>
   import wepy from 'wepy'
+  import labels from "../const/labels";
+  import {httpHead, httpPort} from "../const/properties";
 
   export default class BindPhone extends wepy.page {
     config = {
@@ -61,9 +76,15 @@
     components = {}
 
     data = {
-      phone: 18875758585,
+      showThirdLabelModal: false,
+      labels: labels,
+      s1: 0,
+      s2: 0,
+      s3: 0,
+      phone: 0,
       address: null,
       imgArray: [],
+      label: null,
     }
 
     computed = {}
@@ -71,11 +92,51 @@
     methods = {
       formSubmit(e) {
         console.log('form发生了submit事件，携带数据为：', e.detail.value)
+        let value = e.detail.value;
+        if (value.userName === "" || value.slogan === "" || value.title === "" || value.phonenum === ""){
+          wx.showToast({
+            title: '请填写信息完整',
+            icon: 'none'
+          })
+        }else if (this.address === null){
+          wx.showToast({
+            title: '请选择位置',
+            icon: 'none'
+          })
+        } else if (this.label === null){
+          wx.showToast({
+            title: '请选择标签',
+            icon: 'none'
+          })
+        }else{
+          this.publish(value);
+        }
       },
       formReset() {
         console.log('form发生了reset事件')
         this.imgArray = [];
         this.address = null;
+      },
+
+      thirdLabelCancel() {
+        this.showThirdLabelModal = false;
+      },
+
+      thirdLabelConfirm(){
+        this.showThirdLabelModal = false;
+        this.label = this.labels[this.s1].serviceLabel[this.s2].thirdLabel[this.s3];
+      },
+
+      bindChange(e){
+        let value = e.detail.value;
+        this.s1 = value[0];
+        this.s2 = value[1];
+        this.s3 = value[2];
+        console.log(e);
+      },
+
+      selectLabel(){
+        this.showThirdLabelModal = true;
       },
       async addImg() {
         try {
@@ -100,13 +161,66 @@
         }catch (e){
           console.log(e);
         }
-      }
+      },
     }
 
+    async publish(value) {
+      try{
+        let imgs = [];
+        for (let i = 0;i < this.imgArray.length; i++){
+          let img = await wepy.uploadFile({
+              url: httpHead + httpPort + "/service/postFile",
+              filePath: this.imgArray[i],
+              name: 'file',
+           })
+          console.log(img);
+          imgs.push('data:image/jpeg;base64,' + img.data)
+         }
+        let myDate = new Date();
+        let res = await wepy.request({
+          url: httpHead + httpPort + "/service/newpublish",
+          method: "POST",
+          data: {
+            "address": this.address.name,
+            "datetime": myDate.toLocaleDateString(),
+            "latitude": this.address.latitude,
+            "longitude": this.address.longitude,
+            "phonenum": value.phonenum === '1',
+            "pictureImageValue": imgs,
+            "publishUserId": this.$parent.globalData.user.id,
+            "publisherName": value.userName,
+            "publisherPhoto": "string",
+            "slogan": value.slogan,
+            "thirdLabelId": this.label.id,
+            "title": value.title
+          }
+        });
+        console.log(res.data);
+        if (res.data.status === 200){
+          wx.showToast({
+            title: '发布成功',
+            icon: 'none'
+          })
+          wx.navigateBack();
+        }else{
+          wx.showToast({
+            title: '发布失败',
+            icon: 'none'
+          })
+        }
+        this.$apply();
+      }catch (e){
+        console.log(e);
+      }
+    }
     events = {}
 
     onLoad() {
 
+    }
+
+    onShow(){
+      this.phone = this.$parent.globalData.user.phone;
     }
   }
 </script>

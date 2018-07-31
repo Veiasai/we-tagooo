@@ -26,7 +26,7 @@
           <view class="service-type-label">
             <repeat for="{{item.serviceLabel}}" key="index" index="indexin" item="itemin">
               <view style="border-style: solid; border-color: darkgrey; margin-left: 5rpx; margin-top: 5rpx; margin-bottom: 5rpx; border-radius:10rpx;"
-                    id="{{itemin.id}}" data-item="{{itemin}}" @tap="open" >{{itemin.type}}</view>
+                    id="{{itemin.id}}" data-item="{{itemin}}" @tap="open">{{itemin.type}}</view>
             </repeat>
           </view>
       </view>
@@ -103,7 +103,7 @@
           })
           console.log(res);
           this.$parent.globalData.service = res.data.map((item, index)=>{
-            item.distance = this.getFlatternDistance(item.latitude, item.longitude, lat, lot);
+            item.distance = this.$parent.getFlatternDistance(item.latitude, item.longitude, lat, lot);
             return item;
           }).sort((a, b)=>{
             return a.distance < b.distance;
@@ -141,39 +141,6 @@
       console.log(res);
     }
 
-    getRad(d){
-      let PI = Math.PI;
-      return d*PI/180.0;
-    }
 
-    getFlatternDistance(lat1,lng1,lat2,lng2){
-      let EARTH_RADIUS = 6378137.0;    //单位M
-      let f = this.getRad((lat1 + lat2)/2);
-      let g = this.getRad((lat1 - lat2)/2);
-      let l = this.getRad((lng1 - lng2)/2);
-
-      let sg = Math.sin(g);
-      let sl = Math.sin(l);
-      let sf = Math.sin(f);
-
-      let s,c,w,r,d,h1,h2;
-      let a = EARTH_RADIUS;
-      let fl = 1/298.257;
-
-      sg = sg*sg;
-      sl = sl*sl;
-      sf = sf*sf;
-
-      s = sg*(1-sl) + (1-sf)*sl;
-      c = (1-sg)*(1-sl) + sf*sl;
-
-      w = Math.atan(Math.sqrt(s/c));
-      r = Math.sqrt(s*c)/w;
-      d = 2*w*a;
-      h1 = (3*r -1)/2/c;
-      h2 = (3*r +1)/2/s;
-
-      return (d*(1 + fl*(h1*sf*(1-sg) - h2*(1-sf)*sg))/1000).toFixed(2);
-    }
   }
 </script>

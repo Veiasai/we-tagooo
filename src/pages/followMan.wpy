@@ -2,13 +2,33 @@
 
 </style>
 <template>
-  <view>
-
+  <view style="display: flex; flex-direction: column; align-items: center">
+    <repeat for="{{followServices}}">
+      <view
+        style="display: flex; flex-direction: row; background-color: aliceblue; margin-top: 20rpx; width: 700rpx">
+        <image src="" style="width: 125rpx; height: 125rpx"></image>
+        <view style="width: 425rpx; align-items: left"  @tap="serviceInfo" data-service="{{item}}" data-index="{{index}}">
+          <view style="font-size: 30rpx">{{item.title}}</view>
+        </view>
+        <view style="width: 150rpx; display: flex; flex-direction:column; align-items: right">
+          <view style="font-size: 27rpx">{{item.distance}}千米</view>
+          <view style="font-size: 27rpx;">{{item.certification ? '工商户认证' : '未认证'}}</view>
+          <view @tap="follow" data-service="{{item}}" data-index="{{index}}" style="display: flex; align-items: center">
+            <view  style="font-size: 27rpx;">关注</view>
+            <image
+              mode="aspectFit"
+              style="width: 40rpx; height: 38rpx"
+              src="{{item.follow ? '../resources/icons/follow-2.png' : '../resources/icons/follow-1.png'}}"></image>
+          </view>
+        </view>
+      </view>
+    </repeat>
   </view>
 </template>
 
 <script>
   import wepy from 'wepy'
+  import {httpHead, httpPort} from "../const/properties";
 
   export default class Index extends wepy.page {
     config = {
@@ -21,7 +41,7 @@
 
 
     data = {
-
+      followServices: [],
     }
 
     computed = {
@@ -29,7 +49,22 @@
     }
 
     methods = {
+      serviceInfo(e){
+        console.log(e);
+        let dataset = e.currentTarget.dataset;
+        this.$preload("service", dataset.service);
+        this.$preload("index", dataset.index);
+        this.$navigate({
+          url: "./serviceInfo"
+        })
+      },
 
+      follow(e){
+        console.log(e);
+        let dataset = e.currentTarget.dataset;
+        this.$parent.followRemove(dataset.service);
+        this.followServices.splice(dataset.index, 1);
+      }
     }
 
     events = {
@@ -38,6 +73,40 @@
 
     onLoad() {
 
+    }
+
+    onShow() {
+      if (this.$parent.globalData.user !== null){
+        this.findFollow(this.$parent.globalData.user.id);
+      }else{
+        wx.showToast({
+          title: '尚未登陆,功能受限',
+          icon: 'none'
+        })
+      }
+    }
+
+    async findFollow(id){
+      try {
+        let res = await wepy.request({
+          url: httpHead + httpPort + "/interact/findByUserId",
+          data:{
+            userId: id
+          }
+          })
+        console.log(res);
+        let distan = res.data.distanceList;
+        this.followServices = res.data.serviceinfoDTOList.map((item, index)=>{
+          item.distance = distan[index];
+          item.follow = true;
+          return item;
+        }).sort((a, b)=>{
+          return a.distance < b.distance;
+        });
+        this.$apply();
+      }catch (e){
+        console.log(e);
+      }
     }
   }
 </script>

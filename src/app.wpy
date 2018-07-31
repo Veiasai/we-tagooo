@@ -13,9 +13,10 @@
       pages: [
         'pages/myService',
         'pages/findService',
+
+
         'pages/findMan',
         'pages/followMan',
-
         'pages/bindPhone',
         'pages/serviceInfo',
         'pages/newPublish',
@@ -61,10 +62,12 @@
 
     globalData = {
       location: null,
-      service: null,
-      userId: null,
-      // 0 未登录， 1 未绑定手机号， 2 成功获取UserId
-      userState: 2,
+      service: [],
+      user: null,
+        // {id: "4028815e5dd036b7015dd037e3930000"},
+      // 1 未绑定手机号， 2 成功获取UserId
+      userState: 1,
+      followServices: [],
     }
 
     constructor() {
@@ -74,20 +77,15 @@
     }
 
     onLaunch() {
-
+      this.userState = 1;
+      this.login();
     }
 
     // 通用方法
     checkUserState(state) {
       if (this.globalData.userState === state)
         return true;
-      if (this.globalData.userState === 0) {
-        wx.showToast({
-          title: '用户未登录',
-          icon: 'none'
-        })
-      }
-      else if (this.globalData.userState === 1) {
+      if (this.globalData.userState === 1) {
         wx.showToast({
           title: '用户未绑定手机号',
           icon: 'none'
@@ -96,43 +94,110 @@
       return false;
     }
 
-    async follow() {
+    getRad(d){
+      let PI = Math.PI;
+      return d*PI/180.0;
+    }
+
+    getFlatternDistance(lat1,lng1,lat2,lng2){
+      let EARTH_RADIUS = 6378137.0;    //单位M
+      let f = this.getRad((lat1 + lat2)/2);
+      let g = this.getRad((lat1 - lat2)/2);
+      let l = this.getRad((lng1 - lng2)/2);
+
+      let sg = Math.sin(g);
+      let sl = Math.sin(l);
+      let sf = Math.sin(f);
+
+      let s,c,w,r,d,h1,h2;
+      let a = EARTH_RADIUS;
+      let fl = 1/298.257;
+
+      sg = sg*sg;
+      sl = sl*sl;
+      sf = sf*sf;
+
+      s = sg*(1-sl) + (1-sf)*sl;
+      c = (1-sg)*(1-sl) + sf*sl;
+
+      w = Math.atan(Math.sqrt(s/c));
+      r = Math.sqrt(s*c)/w;
+      d = 2*w*a;
+      h1 = (3*r -1)/2/c;
+      h2 = (3*r +1)/2/s;
+
+      return (d*(1 + fl*(h1*sf*(1-sg) - h2*(1-sf)*sg))/1000).toFixed(2);
+    }
+    async follow(item, id) {
       try {
+        console.log(this.globalData)
         let res = await wepy.request({
           url: httpHead + httpPort + "/interact/follow",
           method: "POST",
           data: {
-            "address": "string",
-            "distance": 0,
-            "latitude": 0,
-            "longitude": 0,
-            "serviceId": "string",
-            "userId": "string"
+            "address": item.address,
+            "distance": item.distance,
+            "latitude": item.latitude,
+            "longitude": item.longitude,
+            "serviceId": item.id,
+            "userId": this.globalData.user.id,
           }
         })
+        console.log(res);
       }catch (e)
       {
-
+        console.log(e);
       }
     }
 
-    async followRemove() {
+    async followRemove(item) {
       try {
         let res = await wepy.request({
           url: httpHead + httpPort + "/interact/follow/remove",
           method: "POST",
           data: {
-            "address": "string",
-            "distance": 0,
-            "latitude": 0,
-            "longitude": 0,
-            "serviceId": "string",
-            "userId": "string"
+            "address": item.address,
+            "distance": item.distance,
+            "latitude": item.latitude,
+            "longitude": item.longitude,
+            "serviceId": item.id,
+            "userId": this.globalData.user.id,
           }
         })
+        console.log(res);
       }catch (e)
       {
+        console.log(e);
+      }
+    }
 
+    async login(){
+      try{
+        let res = await wepy.login();
+        let code = res.code;
+        res = await wepy.request({
+          url: httpHead + httpPort + "/user/wechatlogin",
+          data:{
+            code: code,
+          }
+        })
+        console.log(res);
+        if (res.data.status === 200){
+          wx.showToast({
+            title: '自动登陆成功',
+            icon: 'none'
+          })
+          this.globalData.user = res.data;
+          this.globalData.userState = 2;
+          console.log(res.data);
+        }else{
+          wx.showToast({
+            title: '获取用户信息失败，未绑定手机',
+            icon: 'none'
+          })
+        }
+      }catch (e){
+        console.log(e);
       }
     }
   }

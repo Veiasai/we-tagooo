@@ -18,7 +18,7 @@
           <image
             mode="aspectFit"
             style="width: 40rpx; height: 38rpx"
-            src="{{item.follow ? '../resources/icons/follow-2.png' : '../resources/icons/follow-1.png'}}"></image>
+            src="{{service.follow ? '../resources/icons/follow-2.png' : '../resources/icons/follow-1.png'}}"></image>
         </view>
       </view>
     </view>
@@ -54,8 +54,12 @@
 
     methods = {
       follow(){
-        try{
+        if (this.service.follow){
+          this.$parent.followRemove(this.service);
+        }else{
+          this.$parent.follow(this.service);
         }
+        this.service.follow = !this.service.follow;
       }
     }
 
