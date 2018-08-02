@@ -12,8 +12,8 @@
     config = {
       pages: [
         'pages/findService',
-        'pages/myService',
         'pages/findMan',
+        'pages/myService',
         'pages/followMan',
         'pages/bindPhone',
         'pages/serviceInfo',
@@ -27,8 +27,9 @@
       },
 
       tabBar: {
-        "color": "#a9b7b7",
-        "selectedColor": "#9bc1df",
+        "color":"#ffffff",
+        "selectedColor":"#ffffff",
+        "backgroundColor": "#fe120a",
         "borderStyle": "white",
         "list": [{
           "selectedIconPath": "./resources/icons/searchS.png",

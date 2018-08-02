@@ -4,26 +4,26 @@
 <template>
   <form bindsubmit="formSubmit" bindreset="formReset" >
     <image src="{{userImg}}" style="margin-left:275rpx; margin-top:20rpx; width: 200rpx; height: 200rpx"></image>
-    <view style="background-color: azure; margin-top: 10rpx">
+    <view style="background-color: beige; margin-top: 10rpx">
       <input value="{{defaultName}}" name="userName" placeholder="我的名字" disabled="{{id !== null}}"/>
     </view>
-    <view style="background-color: azure; margin-top: 10rpx; font-size: 35rpx" @tap="selectLabel">
+    <view style="background-color: beige; margin-top: 10rpx; font-size: 35rpx" @tap="selectLabel">
       {{label === null ? "请选择服务类别" : label.name}}
     </view>
-    <view style="background-color: azure; margin-top: 10rpx">
+    <view style="background-color: beige; margin-top: 10rpx">
       <input value="{{defaultTitle}}" name="title" placeholder="服务广告标题" maxlength="20"/>
     </view>
-    <view style="background-color: azure; height: 30vh; margin-top: 10rpx">
+    <view style="background-color: beige; height: 30vh; margin-top: 10rpx">
       <textarea value="{{defaultSlogan}}" name="slogan" placeholder="服务广告详情"/>
     </view>
-    <view @tap="chooseLocation" style="background-color: azure; margin-top: 10rpx; display: flex; flex-direction: row; align-items: center">
+    <view @tap="chooseLocation" style="background-color: beige; margin-top: 10rpx; display: flex; flex-direction: row; align-items: center">
       <image src="../resources/icons/icon-location.png"  mode="scaleToFill" style="width: 100rpx; height: 100rpx;">
       </image>
       <text>
         {{address === null ? "请选择位置" : (address.address +'\n' + address.name)}}
       </text>
     </view>
-    <view style="background-color: azure; display: flex; flex-direction: row; flex-wrap: wrap; margin-top: 10rpx">
+    <view style="background-color: beige; display: flex; flex-direction: row; flex-wrap: wrap; margin-top: 10rpx">
       <repeat for="{{imgArray}}">
         <image src="{{item}}" mode="scaleToFill" style="margin-left: 10rpx; width: 200rpx; height: 200rpx">
         </image>
@@ -31,7 +31,7 @@
       <image src="../resources/icons/photo-add.png" mode="scaleToFill" @tap="addImg" style="width: 200rpx; height: 200rpx; margin-left: 10rpx">
       </image>
     </view>
-    <view style="background-color: azure; margin-top: 10rpx; display: flex; flex-direction: row; font-size: 30rpx">
+    <view style="background-color: beige; margin-top: 10rpx; display: flex; flex-direction: row; font-size: 30rpx">
       <view>在广告中公开手机号码:{{phone}}</view>
       <radio-group name="phonenum">
         <label>

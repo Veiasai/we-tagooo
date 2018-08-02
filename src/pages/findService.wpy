@@ -5,6 +5,7 @@
   align-items: center;
   border-style: solid;
   border-bottom-style: none;
+  border-width: 2rpx;
   border-color: darkgrey;
 }
 
@@ -18,19 +19,24 @@
 </style>
 <template>
   <view style="display: flex; flex-direction: column; align-items: center">
-    <view style="text-align:center; border: solid;border-color: dimgrey; border-bottom-style: none; width: 700rpx">{{location === null || location.name === undefined ? "自动定位中..." : (location.address + location.name)}}</view>
-    <view @tap="location" style="height:70rpx; width: 700rpx; text-align: center; border-style: solid;border-bottom-style: none;border-color: dimgrey;">点击此处，自主定位</view>
-    <repeat for="{{labels}}" key="index" index="index" item="item">
-      <view class="service-type">
-          <view style="width: 200rpx">{{item.type}}</view>
+    <view style="width:750rpx; border-bottom: solid; border-bottom-width: 2rpx; border-top: solid; border-top-width: 2rpx; border-color: darkgrey; margin-top: 15rpx">
+      <view @tap="location" style="background-color: lightgrey;border-radius: 10rpx; margin-top:15rpx; margin-left: 25rpx; margin-bottom:15rpx; text-align:center; width: 700rpx">{{location === null || location.name === undefined ? "自动定位中..." : (location.address + location.name)}}</view>
+    </view>
+    <view style="margin-top: 20rpx">
+      <repeat  for="{{labels}}" key="index" index="index" item="item">
+        <view class="service-type">
+          <view style="margin-left: 15rpx; width: 200rpx">{{item.type}}</view>
           <view class="service-type-label">
             <repeat for="{{item.serviceLabel}}" key="index" index="indexin" item="itemin">
-              <view style="border-style: solid; border-color: darkgrey; margin-left: 5rpx; margin-top: 5rpx; margin-bottom: 5rpx; border-radius:10rpx;"
-                    id="{{itemin.id}}" data-item="{{itemin}}" @tap="open">{{itemin.type}}</view>
+              <view style="border-style: solid; color: red; border-color: red;border-width: 2rpx; margin-left: 10rpx; margin-top: 10rpx; margin-bottom: 10rpx; border-radius:20rpx;"
+                    id="{{itemin.id}}" data-item="{{itemin}}" @tap="open">
+                <view style="text-align:center; font-size:35rpx; margin: 10rpx">{{itemin.type}}</view>
+              </view>
             </repeat>
           </view>
-      </view>
-    </repeat>
+        </view>
+      </repeat>
+    </view>
   </view>
 
   <modal hidden="{{showThirdLabelModal}}" title="选择具体项"  bindcancel="thirdLabelCancel" bindconfirm="thirdLabelConfirm">

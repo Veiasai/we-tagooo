@@ -4,12 +4,25 @@
 <template>
   <view style="display: flex; flex-direction: column; align-items: center">
     <form bindsubmit="formSubmit" bindreset="formReset">
-      <input  name="phone" bindinput="bindPhoneInput" placeholder="输入手机号"/>
-      <view style="display: flex; flex-direction: row; align-items: center">
-        <input  name="validateCode"  placeholder="输入验证码"/>
-        <button size="mini" @tap="getValidateCode">获取验证码</button>
+      <view style="border-bottom: solid; border-bottom-width: 2rpx">
+        <view style="margin: 20rpx; width: 700rpx">
+          <input  name="phone" bindinput="bindPhoneInput" placeholder="输入手机号"/>
+        </view>
       </view>
-      <button style="margin-top: 200rpx;" formType="submit">提交</button>
+      <view style="border-bottom: solid; border-bottom-width: 2rpx">
+        <view style="display: flex; flex-direction: row; align-items: center; margin: 20rpx; width: 700rpx">
+          <input  name="validateCode"  placeholder="输入验证码"/>
+          <button size="mini" style="background-color: red; color: #ffffff" @tap="getValidateCode">获取验证码</button>
+        </view>
+      </view>
+      <button style="margin-top: 50rpx; background-color: red; width: 650rpx; color: #ffffff" formType="submit">提交</button>
+      <view style="margin: 15rpx; font-size: 27rpx">
+        <checkbox-group name="auth">
+            <checkbox value="{{auth.value}}" checked="{{auth.checked}}"/>我同意
+          <a>"服务条款"</a>和
+          <a>"Tagooo用户隐私权保护和个人信息利用政策"</a>
+        </checkbox-group>
+      </view>
     </form>
   </view>
 
@@ -30,6 +43,7 @@
 
     data = {
         phone: null,
+        auth: {value: 1, checked: false}
     }
 
     computed = {
@@ -39,7 +53,25 @@
     methods = {
       formSubmit(e) {
         console.log('form发生了submit事件，携带数据为：', e.detail.value)
-        this.register(e.detail.value.phone, e.detail.value.validateCode)
+        let value = e.detail.value;
+        if (value.phone === "") {
+          wx.showToast({
+            title: '请填写手机号',
+            icon: 'none'
+          })
+        } else if (value.validateCode === "") {
+          wx.showToast({
+            title: '请填写验证码',
+            icon: 'none'
+          })
+        } else if (value.auth.length === 0) {
+          wx.showToast({
+            title: '请确认服务条款',
+            icon: 'none'
+          })
+        } else{
+          this.register(e.detail.value.phone, e.detail.value.validateCode)
+        }
       },
       formReset() {
         console.log('form发生了reset事件')

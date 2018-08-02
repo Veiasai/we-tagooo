@@ -4,13 +4,13 @@
 <template>
   <view style="display: flex; flex-direction: column; align-items: left; margin-left: 25rpx; width: 700rpx">
     <view style="font-size: 30rpx">{{service.basicLabelName}}-{{service.thirdLabelName}}</view>
-    <view style="display: flex; flex-direction: row; background-color: aliceblue; margin-top: 20rpx; ">
-      <image src="" style="width: 125rpx; height: 125rpx"></image>
-      <view style="width: 425rpx; display: flex; flex-direction: column; align-items: left">
+    <view style="display: flex; flex-direction: row; background-color: beige; margin-top: 20rpx; ">
+      <image src="{{item.pic ? item.pic : '../resources/icons/default_pic.png'}}" style="width: 150rpx; height: 150rpx; margin: 20rpx"></image>
+      <view style="width: 310rpx; display: flex; flex-direction: column; align-items: left">
         <view style="font-size: 30rpx">电话：{{service.phonenum ? service.phone : "未公开"}}</view>
         <view style="font-size: 30rpx">地址：{{service.address}}</view>
       </view>
-      <view style="width: 150rpx; display: flex; flex-direction:column; align-items: right">
+      <view style="width: 200rpx; display: flex; flex-direction:column; align-items: right; margin-left: 10rpx">
         <view style="font-size: 30rpx">{{service.distance}}千米</view>
         <view style="font-size: 30rpx;">{{service.certification ? '工商户认证' : '未认证'}}</view>
         <view @tap="follow" style="display: flex; align-items: center">
@@ -22,11 +22,11 @@
         </view>
       </view>
     </view>
-    <scroll-view scroll-y style="height: 45vh; background-color: aliceblue; margin-top: 25rpx">
-        <view style="font-size: 30rpx">{{service.title}}</view>
-        <view style="font-size: 30rpx">{{service.slogan}}</view>
+    <scroll-view scroll-y style="height: 45vh; background-color: beige; margin-top: 25rpx">
+        <view style="font-size: 35rpx; font-weight: bold; margin: 15rpx;">{{service.title}}</view>
+        <view style="font-size: 30rpx; margin: 15rpx;">{{service.slogan}}</view>
     </scroll-view>
-    <view style="width:100%; font-size: 30rpx; background-color: aliceblue; margin-top: 25rpx">发布日期：{{service.datetime}}</view>
+    <view style="width:100%; font-size: 30rpx; background-color: beige; margin-top: 25rpx">发布日期：{{service.datetime}}</view>
   </view>
 </template>
 

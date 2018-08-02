@@ -16,7 +16,7 @@
     </view>
     <repeat for="{{services}}">
       <view
-        style="display: flex; flex-direction: row; background-color: aliceblue; margin-top: 20rpx; margin-left: 25rpx; width: 700rpx;">
+        style="display: flex; flex-direction: row; background-color: beige; margin-top: 20rpx; margin-left: 25rpx; width: 700rpx;">
         <view style="width: 650rpx; display:flex; flex-direction:column; align-items: left" @tap="serviceInfo"
               data-service="{{item}}" data-index="{{index}}">
           <view style="font-size: 35rpx">类别:{{item.serviceLabelName}}</view>
