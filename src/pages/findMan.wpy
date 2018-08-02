@@ -3,24 +3,34 @@
 </style>
 <template>
   <view style="display: flex; flex-direction: column; align-items: center">
-    <view style="border: solid; width: 700rpx">{{location === null || location.name === undefined ? "自动定位中..." : (location.address + location.name + "附近")}}</view>
+    <view style="text-align:center; border: solid;border-color: dimgrey; width: 700rpx">{{location === null ||
+      location.name === undefined ? "自动定位中..." : (location.address + location.name + "附近")}}
+    </view>
+    <form  bindsubmit="formSubmit" bindreset="formReset">
+      <view style="display: flex; flex-direction: row; width: 700rpx">
+        <input style="border: solid;border-color: dimgrey; width: 550rpx" name="name" placeholder="按名字查找服务"/>
+        <button size="mini" style="font-size:30rpx" formType="submit">查找</button>
+      </view>
+    </form>
     <view>
-      <repeat for="{{service}}">
+      <repeat for="{{services}}">
         <view
-          style="display: flex; flex-direction: row; background-color: aliceblue; margin-top: 20rpx; width: 700rpx">
+          style="display: flex; flex-direction: row; background-color: aliceblue; margin-top: 20rpx; width: 700rpx; height: 17vh">
           <image src="" style="width: 125rpx; height: 125rpx"></image>
-          <view @tap="serviceInfo" data-service="{{item}}" data-index="{{index}}" style="width: 425rpx; align-items: left">
-            <view style="font-size: 30rpx">{{item.title}}</view>
+          <view @tap="serviceInfo" data-service="{{item}}" data-index="{{index}}"
+                style="width: 425rpx; align-items: left">
+            <view style="font-size: 35rpx">{{item.title}}</view>
           </view>
           <view style="width: 150rpx; display: flex; flex-direction:column; align-items: right">
-            <view style="font-size: 27rpx">{{item.distance}}千米</view>
-            <view style="font-size: 27rpx;">{{item.certification ? '工商户认证' : '未认证'}}</view>
-            <view @tap="follow" data-service="{{item}}" data-index="{{index}}" style="display: flex; align-items: center">
-              <view  style="font-size: 27rpx;">关注</view>
+            <view style="margin-top:10rpx; font-size: 27rpx">{{item.distance}}千米</view>
+            <view style="margin-top:10rpx; font-size: 27rpx;">{{item.certification ? '工商户认证' : '未认证'}}</view>
+            <view @tap="follow" data-service="{{item}}" data-index="{{index}}"
+                  style="margin-top:10rpx; display: flex; align-items: center">
+              <view style="font-size: 27rpx;">关注</view>
               <image
-              mode="aspectFit"
-              style="width: 40rpx; height: 38rpx"
-              src="{{item.follow ? '../resources/icons/follow-2.png' : '../resources/icons/follow-1.png'}}"></image>
+                mode="aspectFit"
+                style="width: 40rpx; height: 38rpx"
+                src="{{item.follow ? '../resources/icons/follow-2.png' : '../resources/icons/follow-1.png'}}"></image>
             </view>
           </view>
         </view>
@@ -34,22 +44,28 @@
   import {httpHead, httpPort} from "../const/properties";
 
   export default class FindMan extends wepy.page {
+    onShow() {
+      this.location = this.$parent.globalData.location;
+      this.services = this.$parent.globalData.service;
+    }
+
     config = {
       navigationBarTitleText: '找到的人'
     }
 
-    components = {}
-
-
     data = {
       location: null,
-      service: [],
+      services: [],
     }
 
-    computed = {}
-
     methods = {
-      serviceInfo(e){
+      formSubmit(e) {
+        console.log('form发生了submit事件，携带数据为：', e.detail.value)
+        let value = e.detail.value;
+        this.search(value.name)
+      },
+
+      serviceInfo(e) {
         console.log(e);
         let dataset = e.currentTarget.dataset;
         this.$preload("service", dataset.service);
@@ -59,27 +75,46 @@
         })
       },
 
-        follow(e){
-          console.log(e);
-          let dataset = e.currentTarget.dataset;
-          let service = dataset.service;
-          if (service.follow){
-            this.$parent.followRemove(service);
-          }else{
-            this.$parent.follow(service);
-          }
-          this.service[dataset.index].follow = !service.follow;
+      follow(e) {
+        if (this.$parent.globalData.user === null){
+          wx.showToast({
+            title: '尚未登陆,功能受限',
+            icon: 'none'
+          })
+          return;
         }
+        console.log(e);
+        let dataset = e.currentTarget.dataset;
+        let service = dataset.service;
+        if (service.follow) {
+          this.$parent.followRemove(service);
+        } else {
+          this.$parent.follow(service);
+        }
+        this.service[dataset.index].follow = !service.follow;
+      }
     }
 
-    events = {}
+    async search(value){
+      try{
+        let res = await wepy.request({
+          url: httpHead + httpPort + "/service/findbyword",
+          data: {word: value}
+        })
+        let location = this.$parent.globalData.location;
+        let lat = location.latitude;
+        let lot = location.longitude;
+        this.services = res.data.map((item, index)=>{
+          item.distance = this.$parent.getFlatternDistance(item.latitude, item.longitude, lat, lot);
+          return item;
+        }).sort((a, b)=>{
+          return a.distance > b.distance;
+        });;
+        this.$parent.globalData.service = this.services;
+        this.$apply();
+      }catch (e){
 
-    onLoad () {
-
-    }
-    onShow() {
-      this.location = this.$parent.globalData.location;
-      this.service = this.$parent.globalData.service;
+      }
     }
 
 

@@ -2,18 +2,19 @@
 
 </style>
 <template>
-  <form bindsubmit="formSubmit" bindreset="formReset">
+  <form bindsubmit="formSubmit" bindreset="formReset" >
+    <image src="{{userImg}}" style="margin-left:275rpx; margin-top:20rpx; width: 200rpx; height: 200rpx"></image>
     <view style="background-color: azure; margin-top: 10rpx">
-      <input name="userName" placeholder="我的名字"/>
+      <input value="{{defaultName}}" name="userName" placeholder="我的名字" disabled="{{id !== null}}"/>
     </view>
     <view style="background-color: azure; margin-top: 10rpx; font-size: 35rpx" @tap="selectLabel">
-      {{label === null ? "请选择服务类别" : label.type}}
+      {{label === null ? "请选择服务类别" : label.name}}
     </view>
     <view style="background-color: azure; margin-top: 10rpx">
-      <input name="title" placeholder="服务广告标题" maxlength="20"/>
+      <input value="{{defaultTitle}}" name="title" placeholder="服务广告标题" maxlength="20"/>
     </view>
     <view style="background-color: azure; height: 30vh; margin-top: 10rpx">
-      <textarea name="slogan" placeholder="服务广告详情"/>
+      <textarea value="{{defaultSlogan}}" name="slogan" placeholder="服务广告详情"/>
     </view>
     <view @tap="chooseLocation" style="background-color: azure; margin-top: 10rpx; display: flex; flex-direction: row; align-items: center">
       <image src="../resources/icons/icon-location.png"  mode="scaleToFill" style="width: 100rpx; height: 100rpx;">
@@ -34,10 +35,10 @@
       <view>在广告中公开手机号码:{{phone}}</view>
       <radio-group name="phonenum">
         <label>
-          <radio value="1"/>
+          <radio value="1" checked="{{defaultPhone}}"/>
           是</label>
         <label>
-          <radio value="0"/>
+          <radio value="0" checked="{{!defaultPhone}}"/>
           否</label>
       </radio-group>
     </view>
@@ -65,10 +66,33 @@
 
 <script>
   import wepy from 'wepy'
+  import moment from 'moment'
   import labels from "../const/labels";
   import {httpHead, httpPort} from "../const/properties";
 
   export default class BindPhone extends wepy.page {
+    onLoad(param, data) {
+      try {
+        let service = data.preload.service;
+        if (service) {
+          this.id = service.id;
+          this.label = {id: service.thirdLabelId, name: service.basicLabelName + '-' + service.serviceLabelName + '-' + service.thirdLabelName};
+          this.address = {address: service.address, name:"", latitude: service.latitude, longitude: service.longitude};
+          this.defaultName = service.name + "(不能重设名字）";
+          this.defaultTitle = service.title;
+          this.defaultSlogan = service.slogan;
+          this.defaultPhone = service.phonenum;
+        }
+      }catch (e){
+        this.id = null;
+      }
+    }
+
+    onShow(){
+      this.phone = this.$parent.globalData.user.phone;
+      this.userImg = this.$parent.globalData.userInfo.avatarUrl;
+    }
+
     config = {
       navigationBarTitleText: '发布服务'
     }
@@ -76,6 +100,12 @@
     components = {}
 
     data = {
+      id: null,
+      defaultPhone:false,
+      defaultName:"",
+      defaultTitle: "",
+      defaultSlogan: "",
+      userImg:null,
       showThirdLabelModal: false,
       labels: labels,
       s1: 0,
@@ -108,14 +138,18 @@
             title: '请选择标签',
             icon: 'none'
           })
+        }else if (this.id !== null){
+          this.updatePublish(value);
         }else{
           this.publish(value);
         }
       },
       formReset() {
         console.log('form发生了reset事件')
+        if (this.id === null){
+          this.address = null;
+        }
         this.imgArray = [];
-        this.address = null;
       },
 
       thirdLabelCancel() {
@@ -125,6 +159,7 @@
       thirdLabelConfirm(){
         this.showThirdLabelModal = false;
         this.label = this.labels[this.s1].serviceLabel[this.s2].thirdLabel[this.s3];
+        this.label.name = this.labels[this.s1].type +'-'+ this.labels[this.s1].serviceLabel[this.s2].type +'-'+  this.label.type;
       },
 
       bindChange(e){
@@ -153,6 +188,13 @@
         }
       },
       async chooseLocation(){
+        if (this.id !== null){
+          wx.showToast({
+            title: '不能重设位置',
+            icon: 'none'
+          })
+          return;
+        }
         try{
           let res = await wepy.chooseLocation();
           console.log(res);
@@ -167,41 +209,40 @@
     async publish(value) {
       try{
         let imgs = [];
-        for (let i = 0;i < this.imgArray.length; i++){
-          let img = await wepy.uploadFile({
-              url: httpHead + httpPort + "/service/postFile",
-              filePath: this.imgArray[i],
-              name: 'file',
-           })
-          console.log(img);
-          imgs.push('data:image/jpeg;base64,' + img.data)
-         }
-        let myDate = new Date();
+        // for (let i = 0;i < this.imgArray.length; i++){
+        //   let img = await wepy.uploadFile({
+        //       url: httpHead + httpPort + "/service/postFile",
+        //       filePath: this.imgArray[i],
+        //       name: 'file',
+        //    })
+        //   console.log(img);
+        //   imgs.push('data:image/jpeg;base64,' + img.data)
+        //  }
         let res = await wepy.request({
           url: httpHead + httpPort + "/service/newpublish",
           method: "POST",
           data: {
-            "address": this.address.name,
-            "datetime": myDate.toLocaleDateString(),
+            "address": this.address.address + this.address.name,
+            "datetime": moment().format('YYYYMMDD'),
             "latitude": this.address.latitude,
             "longitude": this.address.longitude,
             "phonenum": value.phonenum === '1',
             "pictureImageValue": imgs,
             "publishUserId": this.$parent.globalData.user.id,
             "publisherName": value.userName,
-            "publisherPhoto": "string",
+            "publisherPhoto": this.userImg,
             "slogan": value.slogan,
             "thirdLabelId": this.label.id,
             "title": value.title
           }
         });
         console.log(res.data);
-        if (res.data.status === 200){
+        if (res.data.publishStatus === 0){
+          wx.navigateBack();
           wx.showToast({
             title: '发布成功',
             icon: 'none'
           })
-          wx.navigateBack();
         }else{
           wx.showToast({
             title: '发布失败',
@@ -213,14 +254,42 @@
         console.log(e);
       }
     }
-    events = {}
 
-    onLoad() {
-
+    async updatePublish(value) {
+      try{
+        let imgs = [];
+        let res = await wepy.request({
+          url: httpHead + httpPort + "/service/modify",
+          method: "POST",
+          data: {
+            "id": this.id,
+            "phonenum": value.phonenum === '1',
+            "slogan": value.slogan,
+            "thirdLabelId": this.label.id,
+            "status": "active",
+            "title": value.title
+          }
+        });
+        console.log(res.data);
+        if (res.data.status === 0){
+          wx.navigateBack();
+          wx.showToast({
+            title: '更新成功',
+            icon: 'none'
+          })
+        }else{
+          wx.showToast({
+            title: '更新失败',
+            icon: 'none'
+          })
+        }
+        this.$apply();
+      }catch (e){
+        console.log(e);
+      }
     }
 
-    onShow(){
-      this.phone = this.$parent.globalData.user.phone;
-    }
+
+
   }
 </script>

@@ -9,7 +9,7 @@
         <input  name="validateCode"  placeholder="输入验证码"/>
         <button size="mini" @tap="getValidateCode">获取验证码</button>
       </view>
-      <button style="margin-top: 200rpx;" formType="submit">Submit</button>
+      <button style="margin-top: 200rpx;" formType="submit">提交</button>
     </form>
   </view>
 
@@ -101,6 +101,15 @@
           })
           this.$parent.globalData.user = res.data;
           this.$parent.globalData.userState = 2;
+
+          wepy.request({
+            url: httpHead + httpPort + "/user/uploadphoto",
+            method: "POST",
+            data:{
+              "phone": phone,
+              "photoImageValue": this.$parent.globalData.userInfo.avatarUrl,
+            }
+          })
           wx.navigateBack();
         }else if (res.data.status === 403) {
           wx.showToast({

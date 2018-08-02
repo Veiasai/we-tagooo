@@ -11,10 +11,8 @@
   export default class extends wepy.app {
     config = {
       pages: [
-        'pages/myService',
         'pages/findService',
-
-
+        'pages/myService',
         'pages/findMan',
         'pages/followMan',
         'pages/bindPhone',
@@ -67,6 +65,7 @@
         // {id: "4028815e5dd036b7015dd037e3930000"},
       // 1 未绑定手机号， 2 成功获取UserId
       userState: 1,
+      userInfo:null,
       followServices: [],
     }
 
@@ -79,6 +78,7 @@
     onLaunch() {
       this.userState = 1;
       this.login();
+      this.getLocation();
     }
 
     // 通用方法
@@ -92,6 +92,12 @@
         })
       }
       return false;
+    }
+
+    async getLocation(){
+      let res = await wepy.getLocation();
+      this.globalData.location = res;
+      console.log(res);
     }
 
     getRad(d){
@@ -126,7 +132,8 @@
       h1 = (3*r -1)/2/c;
       h2 = (3*r +1)/2/s;
 
-      return (d*(1 + fl*(h1*sf*(1-sg) - h2*(1-sf)*sg))/1000).toFixed(2);
+      let re = (d*(1 + fl*(h1*sf*(1-sg) - h2*(1-sf)*sg))/1000).toFixed(2);
+      return isNaN(re) ? 0 : re;
     }
     async follow(item, id) {
       try {
@@ -172,6 +179,13 @@
     }
 
     async login(){
+      try {
+        let res = await wepy.getUserInfo();
+        this.globalData.userInfo = res.userInfo;
+      }catch (e){
+        return;
+      }
+
       try{
         let res = await wepy.login();
         let code = res.code;

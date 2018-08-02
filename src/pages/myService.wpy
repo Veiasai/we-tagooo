@@ -4,23 +4,30 @@
 <template>
   <view style="text-align: center">
     <view style="display: flex; flex-direction: row; ">
-      <view style="border: solid; width: 375rpx; border-radius: 10rpx; border-color: aliceblue" @tap="bindPhone">绑定手机</view>
-      <view style="border: solid; width: 375rpx; border-radius: 10rpx; border-color: aliceblue" @tap="newPublish">发布新广告</view>
+      <button style="border: solid; width: 375rpx; border-radius: 10rpx; border-color: aliceblue"
+              open-type="getUserInfo" size="mini" @tap="bindPhone">绑定手机
+      </button>
+      <button style="border: solid; width: 375rpx; border-radius: 10rpx; border-color: aliceblue" size="mini"
+              @tap="newPublish">发布新广告
+      </button>
     </view>
     <view>
       我发布的服务
     </view>
     <repeat for="{{services}}">
       <view
-        data-service="{{item}}" data-index="{{index}}"
         style="display: flex; flex-direction: row; background-color: aliceblue; margin-top: 20rpx; margin-left: 25rpx; width: 700rpx;">
-        <image src="" style="width: 125rpx; height: 125rpx"></image>
-        <view style="width: 425rpx; align-items: left">
-          <view style="font-size: 30rpx">{{item.title}}</view>
+        <view style="width: 650rpx; display:flex; flex-direction:column; align-items: left" @tap="serviceInfo"
+              data-service="{{item}}" data-index="{{index}}">
+          <view style="font-size: 35rpx">类别:{{item.serviceLabelName}}</view>
+          <view style="font-size: 35rpx">标题:{{item.title}}</view>
+          <view style="font-size: 35rpx">发布时间:{{item.datetime}}</view>
         </view>
         <view style="width: 150rpx; display: flex; flex-direction:column; align-items: right">
-          <view style="border: solid; border-radius: 10rpx; border-color: aliceblue; font-size:30rpx" @tap="updateService">修改广告</view>
-          <view style="border: solid; border-radius: 10rpx; border-color: aliceblue; font-size:30rpx" @tap="deleteService">删除广告</view>
+          <view style="font-size:30rpx" data-service="{{item}}" data-index="{{index}}" @tap="updateService">修改广告</view>
+          <view style="font-size:30rpx; margin-top: 20rpx" data-service="{{item}}" data-index="{{index}}"
+                @tap="deleteService">删除广告
+          </view>
         </view>
       </view>
     </repeat>
@@ -31,31 +38,50 @@
 <script>
   import wepy from 'wepy'
   import {httpHead, httpPort} from "../const/properties";
+  import moment from 'moment'
 
   export default class MyService extends wepy.page {
     config = {
       navigationBarTitleText: '我提供的服务'
     }
 
-    components = {
-
-    }
-
     data = {
       services: [],
-    }
-
-    computed = {
-
+      phone: null,
     }
 
     methods = {
-      bindPhone(){
-        wepy.navigateTo({
-          url: "bindPhone"
+      serviceInfo(e) {
+        console.log(e);
+        let dataset = e.currentTarget.dataset;
+        this.$preload("service", dataset.service);
+        this.$preload("index", dataset.index);
+        this.$navigate({
+          url: "./serviceInfo"
         })
       },
-      newPublish(){
+
+      async bindPhone() {
+        try {
+          let res = await wepy.getUserInfo();
+          this.$parent.globalData.userInfo = res.userInfo;
+          this.$apply();
+        } catch (e) {
+          return;
+        }
+        if (this.phone) {
+          wx.showToast({
+            title: '已绑定手机:\r\n' + this.phone,
+            icon: 'none'
+          })
+        } else {
+          wepy.navigateTo({
+            url: "bindPhone"
+          })
+        }
+
+      },
+      newPublish() {
         if (!this.$parent.checkUserState(2)) {
           return;
         }
@@ -63,36 +89,92 @@
           url: "newPublish"
         })
       },
-      updateService(){
 
+      updateService(e) {
+        console.log(e);
+        let dataset = e.currentTarget.dataset;
+        this.$preload("service", dataset.service);
+        this.$navigate({
+          url: "./newPublish"
+        })
       },
-      deleteService(){
 
+      async deleteService(e) {
+        try {
+          let dataset = e.currentTarget.dataset;
+          let res = await wepy.showModal({
+            title: "确认删除",
+            content: "删除操作不可撤销，确认？",
+          })
+          if (res.confirm) {
+            res = await wepy.request({
+              url: httpHead + httpPort + "/service/remove",
+              data: {serviceid: dataset.service.id}
+            })
+            if (res.data.status === 0) {
+              wx.showToast({
+                title: '删除成功',
+                icon: 'none'
+              })
+              this.services.splice(dataset.index, 1);
+              this.$apply();
+            }
+            console.log(res);
+            console.log(dataset);
+          }
+        } catch (e) {
+
+        }
       }
-    }
-
-    events = {
-
     }
 
     onShow() {
+      this.uploadPhoto();
       if (!this.$parent.checkUserState(2)) {
+        this.phone = null;
         return;
       }
+      this.phone = this.$parent.globalData.user.phone;
       this.findUserService(this.$parent.globalData.user.id);
     }
 
-    async findUserService(id){
+    async uploadPhoto(){
       try{
+        // console.log(this.$parent.globalData.userInfo.avatarUrl)
+        // let img = await wepy.request({
+        //   url: this.$parent.globalData.userInfo.avatarUrl,
+        //   method:'GET',
+        //   responseType: 'arraybuffer',
+        // })
+        // console.log(img)
+        // let base64 ='data:image/jpg;base64,'+ wx.arrayBufferToBase64(img);
+        // console.log(base64);
+        let res = await wepy.request({
+          url: httpHead + httpPort + "/user/uploadphoto",
+          method: "POST",
+          data:{
+            "phone": this.$parent.globalData.user.phone,
+            "photoImageValue": this.$parent.globalData.userInfo.avatarUrl,
+          }
+        })
+        console.log(res);
+      }catch (e){
+
+      }
+    }
+
+    async findUserService(id) {
+      try {
         let res = await wepy.request({
           url: httpHead + httpPort + "/interact/findByPublishUserId",
-          data:{
+          data: {
             userId: id
           }
         })
         console.log(res.data);
         this.services = res.data.serviceinfoDTOList;
-      }catch (e){
+        this.$apply();
+      } catch (e) {
 
       }
     }

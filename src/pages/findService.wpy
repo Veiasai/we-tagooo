@@ -18,8 +18,8 @@
 </style>
 <template>
   <view style="display: flex; flex-direction: column; align-items: center">
-    <view style="border: solid; width: 700rpx">{{location === null || location.name === undefined ? "自动定位中..." : (location.address + location.name)}}</view>
-    <button type="default" @tap="location" style="width: 700rpx;">手动定位</button>
+    <view style="text-align:center; border: solid;border-color: dimgrey; border-bottom-style: none; width: 700rpx">{{location === null || location.name === undefined ? "自动定位中..." : (location.address + location.name)}}</view>
+    <view @tap="location" style="height:70rpx; width: 700rpx; text-align: center; border-style: solid;border-bottom-style: none;border-color: dimgrey;">点击此处，自主定位</view>
     <repeat for="{{labels}}" key="index" index="index" item="item">
       <view class="service-type">
           <view style="width: 200rpx">{{item.type}}</view>
@@ -106,8 +106,19 @@
             item.distance = this.$parent.getFlatternDistance(item.latitude, item.longitude, lat, lot);
             return item;
           }).sort((a, b)=>{
-            return a.distance < b.distance;
+            return a.distance > b.distance;
           });
+
+          // for (let i = 0;i<this.$parent.globalData.service.length;i++){
+          //   let img = await wepy.request({
+          //     url: httpHead + httpPort + "/user/getphotobyid",
+          //     data: {
+          //       id: this.$parent.globalData.service[i].id
+          //     }
+          //   })
+          //   console.log(img);
+          // }
+          this.$apply();
           wx.switchTab({
             url: "./findMan"
           })
@@ -135,12 +146,9 @@
 
     }
 
-    async onLoad() {
-      let res = await wepy.getLocation();
-      this.$parent.globalData.location = res;
-      console.log(res);
-    }
+    onLoad() {
 
+    }
 
   }
 </script>
