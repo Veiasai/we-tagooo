@@ -1,34 +1,25 @@
 <style lang="less">
 
 </style>
+
 <template>
   <view style="display: flex; flex-direction: column; align-items: center">
     <repeat for="{{followServices}}">
-      <view
-        style="display: flex; flex-direction: row; background-color: #ebebeb; margin-top: 20rpx; margin-left:25rpx; width: 750rpx; height: 17vh">
-        <image src="{{item.pic ? item.pic : '../resources/icons/default_pic.png'}}" style="width: 150rpx; height: 150rpx; margin: 10rpx"></image>
-        <view @tap="serviceInfo" data-service="{{item}}" data-index="{{index}}"
-              style="width: 310rpx; align-items: left; margin: 10rpx">
-          <view style="font-size: 32rpx; font-weight: bold">{{item.name}}</view>
-          <view style="font-size: 25rpx;">{{item.title}}</view>
+      <view style="display: flex; flex-direction: row; background-color: #ebebeb; margin-top: 20rpx; margin-left:25rpx; width: 750rpx; height: 17vh">
+        <image src="{{item.pic ? item.pic.data : '../resources/icons/default_pic.png'}}" style="width: 150rpx; height: 150rpx; margin: 20rpx" />
+        <view @tap="serviceInfo" data-service="{{item}}" data-index="{{index}}" style="width: 310rpx; align-items: left; margin: 10rpx">
+          <view style="font-size: 40rpx; font-weight: bold">{{item.name}}</view>
+          <view style="font-size: 35rpx;">{{item.title}}</view>
         </view>
         <view style="width: 200rpx; display: flex; flex-direction:column; align-items: right">
           <view style="margin-top:10rpx; font-size: 27rpx">{{item.distance}}千米</view>
           <view style="display: flex; flex-direction: row;">
             <view style="margin-top:10rpx; font-size: 27rpx;">{{item.certification ? '工商户认证' : '未认证'}}</view>
-            <image
-              mode="aspectFit"
-              style="width: 40rpx; height: 38rpx"
-              src='../resources/icons/auth.png' />
+            <image mode="aspectFit" style="width: 40rpx; height: 38rpx" src='../resources/icons/auth.png' />
           </view>
-
-          <view @tap="follow" data-service="{{item}}" data-index="{{index}}"
-                style="margin-top:10rpx; display: flex; align-items: center">
+          <view @tap="follow" data-service="{{item}}" data-index="{{index}}" style="margin-top:10rpx; display: flex; align-items: center">
             <view style="font-size: 27rpx;">关注</view>
-            <image
-              mode="aspectFit"
-              style="width: 40rpx; height: 38rpx"
-              src="{{item.follow ? '../resources/icons/follow-2.png' : '../resources/icons/follow-1.png'}}" />
+            <image mode="aspectFit" style="width: 40rpx; height: 38rpx" src="{{item.follow ? '../resources/icons/follow-2.png' : '../resources/icons/follow-1.png'}}" />
           </view>
         </view>
       </view>
@@ -38,28 +29,23 @@
 
 <script>
   import wepy from 'wepy'
-  import {httpHead, httpPort} from "../const/properties";
-
+  import {
+    httpHead,
+    httpPort
+  } from "../const/properties";
   export default class Index extends wepy.page {
     config = {
       navigationBarTitleText: '我的关注'
     }
-
     components = {
-
     }
-
-
     data = {
       followServices: [],
     }
-
     computed = {
-
     }
-
     methods = {
-      serviceInfo(e){
+      serviceInfo(e) {
         console.log(e);
         let dataset = e.currentTarget.dataset;
         this.$preload("service", dataset.service);
@@ -68,67 +54,65 @@
           url: "./serviceInfo"
         })
       },
-
-      follow(e){
+      follow(e) {
+        if (this.$parent.globalData.user === null) {
+          wx.showToast({
+            title: '尚未登陆,功能受限',
+            icon: 'none'
+          })
+          return;
+        }
         console.log(e);
         let dataset = e.currentTarget.dataset;
         this.$parent.followRemove(dataset.service);
         this.followServices.splice(dataset.index, 1);
       }
     }
-
     events = {
-
     }
-
     onLoad() {
-
     }
-
     onShow() {
-      if (this.$parent.globalData.user !== null){
+      if (this.$parent.globalData.user !== null) {
         this.findFollow(this.$parent.globalData.user.id);
-      }else{
+      } else {
         wx.showToast({
           title: '尚未登陆,功能受限',
           icon: 'none'
         })
       }
     }
-
-    async findFollow(id){
+    async findFollow(id) {
       try {
         let res = await wepy.request({
           url: httpHead + httpPort + "/interact/findByUserId",
-          data:{
+          data: {
             userId: id
           }
-          })
+        })
         console.log(res);
         // let distan = res.data.distanceList;
         let location = this.$parent.globalData.location;
         let lat = location.latitude;
         let lot = location.longitude;
-        this.followServices = res.data.serviceinfoDTOList.map((item, index)=>{
+        this.followServices = res.data.serviceinfoDTOList.map((item, index) => {
           // item.distance = distan[index];
           item.distance = this.$parent.getFlatternDistance(item.latitude, item.longitude, lat, lot);
           item.follow = true;
           return item;
-        }).sort((a, b)=>{
+        }).sort((a, b) => {
           return a.distance > b.distance;
         });
-
-        // for (let i = 0;i<this.followServices.length;i++){
-        //   let img = await wepy.request({
-        //     url: httpHead + httpPort + "/user/getphotobyid",
-        //     data: {
-        //       id: this.followServices[i].publishUserId
-        //     }
-        //   })
-        //   console.log(img);
-        // }
+        for (let i = 0; i < this.followServices.length; i++) {
+          this.followServices[i].pic = await wepy.request({
+            url: httpHead + httpPort + "/user/getphoto",
+            data: {
+              "phone": this.followServices[i].phone
+            }
+          })
+        }
         this.$apply();
-      }catch (e){
+      } catch (e) {
         console.log(e);
       }
     }

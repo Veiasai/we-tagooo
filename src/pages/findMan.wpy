@@ -1,18 +1,18 @@
 <style lang="less">
 
 </style>
+
 <template>
   <view style="display: flex; flex-direction: column; align-items: center">
     <view style="width:750rpx; border-bottom: solid; border-bottom-width: 2rpx; border-top: solid; border-top-width: 2rpx; border-color: darkgrey; margin-top: 15rpx">
-      <view style="background-color: lightgrey;border-radius: 10rpx; margin-top:15rpx; margin-left: 25rpx; margin-bottom:15rpx; text-align:center; width: 700rpx">{{location === null ||
-        location.name === undefined ? "自动定位中..." : (location.address + location.name + "附近")}}
+      <view style="background-color: lightgrey;border-radius: 10rpx; margin-top:15rpx; margin-left: 25rpx; margin-bottom:15rpx; text-align:center; width: 700rpx">{{location === null || location.name === undefined ? "自动定位中..." : (location.address + location.name + "附近")}}
       </view>
     </view>
     <view style="border-bottom: solid; border-bottom-width: 2rpx; border-color: darkgrey; width:750rpx">
-      <form  bindsubmit="formSubmit" bindreset="formReset">
+      <form bindsubmit="formSubmit" bindreset="formReset">
         <view style="display: flex; flex-direction: row; width: 700rpx; margin: 15rpx; align-items: center">
           <view style="border: solid;border-color: dimgrey; width: 500rpx; border-width: 3rpx; border-radius: 20rpx; margin-left:20rpx">
-            <input name="name" placeholder="按名字查找服务"/>
+            <input name="name" placeholder="按名字查找服务" />
           </view>
           <view style="height: 60rpx; margin-left: 15rpx; border-radius: 20rpx">
             <button size="mini" style="font-size:30rpx; " formType="submit">查找</button>
@@ -20,34 +20,23 @@
         </view>
       </form>
     </view>
-
     <view style="margin-top: 15rpx;">
       <repeat for="{{services}}">
-        <view
-          style="display: flex; flex-direction: row; background-color: #ebebeb; margin-top: 20rpx; margin-left:25rpx; width: 750rpx; height: 17vh">
-          <image src="{{item.pic ? item.pic : '../resources/icons/default_pic.png'}}" style="width: 150rpx; height: 150rpx; margin: 10rpx"></image>
-          <view @tap="serviceInfo" data-service="{{item}}" data-index="{{index}}"
-                style="width: 310rpx; align-items: left; margin: 10rpx">
-            <view style="font-size: 32rpx; font-weight: bold">{{item.name}}</view>
-            <view style="font-size: 25rpx;">{{item.title}}</view>
+        <view style="display: flex; flex-direction: row; background-color: #ebebeb; margin-top: 20rpx; margin-left:25rpx; width: 750rpx; height: 190rpx">
+          <image src="{{item.pic ? item.pic.data : '../resources/icons/default_pic.png'}}" style="width: 150rpx; height: 150rpx; margin: 20rpx" />
+          <view @tap="serviceInfo" data-service="{{item}}" data-index="{{index}}" style="width: 310rpx; align-items: left; margin: 10rpx">
+            <view style="font-size: 40rpx; font-weight: bold">{{item.name}}</view>
+            <view style="font-size: 35rpx;">{{item.title}}</view>
           </view>
           <view style="width: 200rpx; display: flex; flex-direction:column; align-items: right">
             <view style="margin-top:10rpx; font-size: 27rpx">{{item.distance}}千米</view>
             <view style="display: flex; flex-direction: row;">
               <view style="margin-top:10rpx; font-size: 27rpx;">{{item.certification ? '工商户认证' : '未认证'}}</view>
-              <image
-                mode="aspectFit"
-                style="width: 40rpx; height: 38rpx"
-                src='../resources/icons/auth.png' />
+              <image mode="aspectFit" style="width: 40rpx; height: 38rpx" src='../resources/icons/auth.png' />
             </view>
-
-            <view @tap="follow" data-service="{{item}}" data-index="{{index}}"
-                  style="margin-top:10rpx; display: flex; align-items: center">
+            <view @tap="follow" data-service="{{item}}" data-index="{{index}}" style="margin-top:10rpx; display: flex; align-items: center">
               <view style="font-size: 27rpx;">关注</view>
-              <image
-                mode="aspectFit"
-                style="width: 40rpx; height: 38rpx"
-                src="{{item.follow ? '../resources/icons/follow-2.png' : '../resources/icons/follow-1.png'}}" />
+              <image mode="aspectFit" style="width: 40rpx; height: 38rpx" src="{{item.follow ? '../resources/icons/follow-2.png' : '../resources/icons/follow-1.png'}}" />
             </view>
           </view>
         </view>
@@ -58,30 +47,28 @@
 
 <script>
   import wepy from 'wepy'
-  import {httpHead, httpPort} from "../const/properties";
-
+  import {
+    httpHead,
+    httpPort
+  } from "../const/properties";
   export default class FindMan extends wepy.page {
     onShow() {
       this.location = this.$parent.globalData.location;
       this.services = this.$parent.globalData.service;
     }
-
     config = {
       navigationBarTitleText: '找到的人'
     }
-
     data = {
       location: null,
       services: [],
     }
-
     methods = {
       formSubmit(e) {
         console.log('form发生了submit事件，携带数据为：', e.detail.value)
         let value = e.detail.value;
         this.search(value.name)
       },
-
       serviceInfo(e) {
         console.log(e);
         let dataset = e.currentTarget.dataset;
@@ -91,9 +78,8 @@
           url: "./serviceInfo"
         })
       },
-
       follow(e) {
-        if (this.$parent.globalData.user === null){
+        if (this.$parent.globalData.user === null) {
           wx.showToast({
             title: '尚未登陆,功能受限',
             icon: 'none'
@@ -111,29 +97,36 @@
         this.services[dataset.index].follow = !service.follow;
       }
     }
-
-    async search(value){
-      try{
+    async search(value) {
+      try {
         let res = await wepy.request({
           url: httpHead + httpPort + "/service/findbyword",
-          data: {word: value}
+          data: {
+            word: value
+          }
         })
         let location = this.$parent.globalData.location;
         let lat = location.latitude;
         let lot = location.longitude;
-        this.services = res.data.map((item, index)=>{
+        this.services = res.data.map((item, index) => {
           item.distance = this.$parent.getFlatternDistance(item.latitude, item.longitude, lat, lot);
           return item;
-        }).sort((a, b)=>{
+        }).sort((a, b) => {
           return a.distance > b.distance;
-        });;
+        });
+        
+        for (let i = 0; i < this.services.length; i++) {
+          this.services[i].pic = await wepy.request({
+            url: httpHead + httpPort + "/user/getphoto",
+            data: {
+              "phone": this.services[i].phone
+            }
+          })
+        }
+        console.log(this.services);
         this.$parent.globalData.service = this.services;
         this.$apply();
-      }catch (e){
-
-      }
+      } catch (e) {}
     }
-
-
   }
 </script>

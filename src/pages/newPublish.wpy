@@ -1,111 +1,126 @@
 <style lang="less">
 
 </style>
+
 <template>
-  <form bindsubmit="formSubmit" bindreset="formReset" >
-    <image src="{{userImg}}" style="margin-left:275rpx; margin-top:20rpx; width: 200rpx; height: 200rpx"></image>
-    <view style="background-color: #ebebeb; margin-top: 10rpx">
-      <input value="{{defaultName}}" name="userName" placeholder="我的名字" disabled="{{id !== null}}"/>
-    </view>
-    <view style="background-color: #ebebeb; margin-top: 10rpx; font-size: 35rpx" @tap="selectLabel">
-      {{label === null ? "请选择服务类别" : label.name}}
-    </view>
-    <view style="background-color: #ebebeb; margin-top: 10rpx">
-      <input value="{{defaultTitle}}" name="title" placeholder="服务广告标题" maxlength="20"/>
-    </view>
-    <view style="background-color: #ebebeb; height: 30vh; margin-top: 10rpx">
-      <textarea value="{{defaultSlogan}}" name="slogan" placeholder="服务广告详情"/>
-    </view>
-    <view @tap="chooseLocation" style="background-color: #ebebeb; margin-top: 10rpx; display: flex; flex-direction: row; align-items: center">
-      <image src="../resources/icons/icon-location.png"  mode="scaleToFill" style="width: 100rpx; height: 100rpx;">
-      </image>
-      <text>
-        {{address === null ? "请选择位置" : (address.address +'\n' + address.name)}}
-      </text>
-    </view>
-    <view style="background-color: #ebebeb; display: flex; flex-direction: row; flex-wrap: wrap; margin-top: 10rpx">
-      <repeat for="{{imgArray}}">
-        <image src="{{item}}" mode="scaleToFill" style="margin-left: 10rpx; width: 200rpx; height: 200rpx">
+  <view>
+    <form bindsubmit="formSubmit" bindreset="formReset">
+      <view style="display: flex; flex-direction: row;">
+        <image @tap="addUserImg" src="{{userImg === null ? '../resources/icons/addPhoto.png' : userImg}}" style="margin-left:275rpx;  width: 200rpx; height: 200rpx" />
+        <image style="height: 80rpx; width: 200rpx" src='../resources/icons/imageHint.png' />
+      </view>
+      <view style="background-color: #ebebeb; width: 300rpx; margin-left: 225rpx; margin-top: 20rpx">
+        <input value="{{defaultName}}" name="userName" placeholder="我的名字" disabled="{{id !== null}}" />
+      </view>
+      <view @tap="chooseLocation" style="background-color: #ebebeb; margin-top: 10rpx; display: flex; flex-direction: row; align-items: center; font-size: 35rpx">
+        <image src="../resources/icons/icon-location.png" mode="scaleToFill" style="width: 35rpx; height: 35rpx;">
         </image>
-      </repeat>
-      <image src="../resources/icons/photo-add.png" mode="scaleToFill" @tap="addImg" style="width: 200rpx; height: 200rpx; margin-left: 10rpx">
-      </image>
-    </view>
-    <view style="background-color: #ebebeb; margin-top: 10rpx; display: flex; flex-direction: row; font-size: 30rpx">
-      <view>在广告中公开手机号码:{{phone}}</view>
-      <radio-group name="phonenum">
-        <label>
-          <radio value="1" checked="{{defaultPhone}}"/>
-          是</label>
-        <label>
-          <radio value="0" checked="{{!defaultPhone}}"/>
-          否</label>
-      </radio-group>
-    </view>
-    <view style="margin-top: 10rpx; display: flex; flex-direction: row; align-items: center">
-      <button formType="submit">提交</button>
-      <button formType="reset">重置</button>
-    </view>
-  </form>
-
-  <modal hidden="{{!showThirdLabelModal}}" title="选择具体项"  bindcancel="thirdLabelCancel" bindconfirm="thirdLabelConfirm">
-  <picker-view indicator-style="height: 50px;" style="width: 100%; height: 300px;" value="{{value}}" bindchange="bindChange">
-    <picker-view-column>
-      <view wx:for="{{labels}}" style="line-height: 50px">{{item.type}}</view>
-    </picker-view-column>
-    <picker-view-column>
-      <view wx:for="{{labels[s1].serviceLabel}}" style="line-height: 50px">{{item.type}}</view>
-    </picker-view-column>
-    <picker-view-column>
-      <view wx:for="{{labels[s1].serviceLabel[s2].thirdLabel}}" style="line-height: 50px">{{item.type}}</view>
-    </picker-view-column>
-  </picker-view>
-  </modal>
-
+        <view>
+          {{address === null ? "请选择位置" : (address.address +'\n' + address.name)}}
+        </view>
+      </view>
+      <view style="background-color: #ebebeb; margin-top: 10rpx; font-size: 35rpx" @tap="selectLabel">
+        {{label === null ? "请选择服务类别" : label.name}}
+      </view>
+      <view style="background-color: #ebebeb; margin-top: 10rpx">
+        <input value="{{defaultTitle}}" name="title" placeholder="服务广告标题" maxlength="20" />
+      </view>
+      <view style="background-color: #ebebeb; height: 30vh; margin-top: 10rpx">
+        <textarea value="{{defaultSlogan}}" name="slogan" placeholder="服务广告详情" />
+      </view>
+      <view style="background-color: #ebebeb; display: flex; flex-direction: row; flex-wrap: wrap; margin-top: 10rpx">
+        <repeat for="{{imgArray}}">
+          <image src="{{item}}" mode="scaleToFill" style="margin: 10rpx; width: 160rpx; height: 160rpx" />
+        </repeat>
+        <view wx:if="{{imgArray.length < 4}}">
+          <image src="../resources/icons/addPicture.png" mode="scaleToFill" @tap="addImg" style="width: 160rpx; height: 160rpx; margin: 10rpx" />
+        </view>
+      </view>
+      <view style="background-color: #ebebeb; margin-top: 10rpx; display: flex; flex-direction: row; font-size: 32rpx">
+        <view>在广告中公开手机号码:{{phone}} </view>
+        <radio-group name="phonenum">
+          <label>
+                  <radio value="1" checked="{{defaultPhone}}"/>
+                  是</label>
+          <label>
+                  <radio value="0" checked="{{!defaultPhone}}"/>
+                  否</label>
+        </radio-group>
+      </view>
+      <view style="margin-top: 10rpx; display: flex; flex-direction: row; align-items: center">
+        <button size="mini" style="background-color: red; color: #ffffff" formType="submit">提交</button>
+      </view>
+    </form>
+    <modal hidden="{{!showThirdLabelModal}}" title="选择具体项" bindcancel="thirdLabelCancel" bindconfirm="thirdLabelConfirm">
+      <picker-view indicator-style="height: 50px;" style="width: 100%; height: 300px;" value="{{value}}" bindchange="bindChange">
+        <picker-view-column>
+          <view wx:for="{{labels}}" style="line-height: 50px">{{item.type}}</view>
+        </picker-view-column>
+        <picker-view-column>
+          <view wx:for="{{labels[s1].serviceLabel}}" style="line-height: 50px">{{item.type}}</view>
+        </picker-view-column>
+        <picker-view-column>
+          <view wx:for="{{labels[s1].serviceLabel[s2].thirdLabel}}" style="line-height: 50px">{{item.type}}</view>
+        </picker-view-column>
+      </picker-view>
+    </modal>
+  </view>
 </template>
 
 <script>
   import wepy from 'wepy'
   import moment from 'moment'
   import labels from "../const/labels";
-  import {httpHead, httpPort} from "../const/properties";
-
+  import {
+    httpHead,
+    httpPort
+  } from "../const/properties";
   export default class BindPhone extends wepy.page {
-    onLoad(param, data) {
+    async onLoad(param, data) {
       try {
+        this.phone = this.$parent.globalData.user.phone;
         let service = data.preload.service;
         if (service) {
           this.id = service.id;
-          this.label = {id: service.thirdLabelId, name: service.basicLabelName + '-' + service.serviceLabelName + '-' + service.thirdLabelName};
-          this.address = {address: service.address, name:"", latitude: service.latitude, longitude: service.longitude};
+          this.label = {
+            id: service.thirdLabelId,
+            name: service.basicLabelName + '-' + service.serviceLabelName + '-' + service.thirdLabelName
+          };
+          this.address = {
+            address: service.address,
+            name: "",
+            latitude: service.latitude,
+            longitude: service.longitude
+          };
           this.defaultName = service.name + "(不能重设名字）";
           this.defaultTitle = service.title;
           this.defaultSlogan = service.slogan;
           this.defaultPhone = service.phonenum;
+          let res = await wepy.request({
+            url: httpHead + httpPort + "/user/getphoto",
+            data: {
+              phone: this.phone
+            }
+          })
+          this.userImg = res.data;
+          this.$apply();
         }
-      }catch (e){
+      } catch (e) {
         this.id = null;
       }
     }
-
-    onShow(){
-      this.phone = this.$parent.globalData.user.phone;
-      this.userImg = this.$parent.globalData.userInfo.avatarUrl;
-    }
-
     config = {
       navigationBarTitleText: '发布服务'
     }
-
     components = {}
-
     data = {
       id: null,
-      defaultPhone:false,
-      defaultName:"",
+      defaultPhone: false,
+      defaultName: "",
       defaultTitle: "",
       defaultSlogan: "",
-      userImg:null,
+      userImg: null,
+      userImgChange: false,
       showThirdLabelModal: false,
       labels: labels,
       s1: 0,
@@ -116,108 +131,119 @@
       imgArray: [],
       label: null,
     }
-
     computed = {}
-
     methods = {
       formSubmit(e) {
         console.log('form发生了submit事件，携带数据为：', e.detail.value)
         let value = e.detail.value;
-        if (value.userName === "" || value.slogan === "" || value.title === "" || value.phonenum === ""){
+        if (value.userName === "" || value.slogan === "" || value.title === "" || value.phonenum === "") {
           wx.showToast({
             title: '请填写信息完整',
             icon: 'none'
           })
-        }else if (this.address === null){
+        } else if (this.address === null) {
           wx.showToast({
             title: '请选择位置',
             icon: 'none'
           })
-        } else if (this.label === null){
+        } else if (this.label === null) {
           wx.showToast({
-            title: '请选择标签',
+            title: '请选择服务类别',
             icon: 'none'
           })
-        }else if (this.id !== null){
+        } else if (this.userImg === null) {
+          wx.showToast({
+            title: '请上传头像',
+            icon: 'none'
+          })
+        } else if (this.id !== null) {
           this.updatePublish(value);
-        }else{
+        } else {
           this.publish(value);
         }
       },
       formReset() {
         console.log('form发生了reset事件')
-        if (this.id === null){
+        if (this.id === null) {
           this.address = null;
         }
         this.imgArray = [];
       },
-
       thirdLabelCancel() {
         this.showThirdLabelModal = false;
       },
-
-      thirdLabelConfirm(){
+      thirdLabelConfirm() {
         this.showThirdLabelModal = false;
         this.label = this.labels[this.s1].serviceLabel[this.s2].thirdLabel[this.s3];
-        this.label.name = this.labels[this.s1].type +'-'+ this.labels[this.s1].serviceLabel[this.s2].type +'-'+  this.label.type;
+        this.label.name = this.labels[this.s1].type + '-' + this.labels[this.s1].serviceLabel[this.s2].type + '-' + this.label.type;
       },
-
-      bindChange(e){
+      bindChange(e) {
         let value = e.detail.value;
         this.s1 = value[0];
         this.s2 = value[1];
         this.s3 = value[2];
         console.log(e);
       },
-
-      selectLabel(){
+      selectLabel() {
         this.showThirdLabelModal = true;
-      },
-      async addImg() {
-        try {
-          let res = await wepy.chooseImage({
-            count: 6, // 默认9
-            sizeType: ['compressed'], // 可以指定是原图还是压缩图，默认二者都有
-            sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
-          })
-
-          this.imgArray.push(...res.tempFilePaths);
-          this.$apply();
-        } catch (e) {
-          console.log(e);
-        }
-      },
-      async chooseLocation(){
-        if (this.id !== null){
-          wx.showToast({
-            title: '不能重设位置',
-            icon: 'none'
-          })
-          return;
-        }
-        try{
-          let res = await wepy.chooseLocation();
-          console.log(res);
-          this.address = res;
-          this.$apply();
-        }catch (e){
-          console.log(e);
-        }
-      },
+      }
     }
-
+    async addImg() {
+      try {
+        let res = await wepy.chooseImage({
+          count: 4 - this.imgArray.length, // 默认9
+          sizeType: ['compressed'], // 可以指定是原图还是压缩图，默认二者都有
+          sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
+        })
+        this.imgArray.push(...res.tempFilePaths);
+        this.$apply();
+      } catch (e) {
+        console.log(e);
+      }
+    }
+    async addUserImg() {
+      try {
+        let res = await wepy.chooseImage({
+          count: 1, // 默认9
+          sizeType: ['compressed'], // 可以指定是原图还是压缩图，默认二者都有
+          sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
+        })
+        this.userImg = res.tempFilePaths[0];
+        this.userImgChange = true;
+        this.$apply();
+      } catch (e) {
+        console.log(e);
+      }
+    }
+    async chooseLocation() {
+      if (this.id !== null) {
+        wx.showToast({
+          title: '不能重设位置',
+          icon: 'none'
+        })
+        return;
+      }
+      try {
+        let res = await wepy.chooseLocation();
+        console.log(res);
+        this.address = res;
+        this.$apply();
+      } catch (e) {
+        console.log(e);
+      }
+    }
     async publish(value) {
-      try{
+      try {
         let imgs = [];
-        // for (let i = 0;i < this.imgArray.length; i++){
-        //   let img = await wepy.uploadFile({
-        //       url: httpHead + httpPort + "/service/postFile",
-        //       filePath: this.imgArray[i],
-        //       name: 'file',
-        //    })
-        //   console.log(img);
-        //   imgs.push('data:image/jpeg;base64,' + img.data)
-        //  }
+        for (let i = 0; i < this.imgArray.length; i++) {
+          let res = await wepy.uploadFile({
+            url: httpHead + httpPort + "/service/postFile",
+            filePath: this.imgArray[i],
+            name: 'file',
+          })
+          imgs.push(res.data)
+          console.log(res);
+        }
         let res = await wepy.request({
           url: httpHead + httpPort + "/service/newpublish",
           method: "POST",
@@ -230,34 +256,48 @@
             "pictureImageValue": imgs,
             "publishUserId": this.$parent.globalData.user.id,
             "publisherName": value.userName,
-            "publisherPhoto": this.userImg,
+            "publisherPhoto": '',
             "slogan": value.slogan,
             "thirdLabelId": this.label.id,
             "title": value.title
           }
         });
         console.log(res.data);
-        if (res.data.publishStatus === 0){
+        if (res.data.publishStatus === 0) {
+          if (this.userImgChange) {
+            let res = await wepy.uploadFile({
+              url: httpHead + httpPort + "/service/postFile",
+              filePath: this.userImg,
+              name: 'file',
+            })
+            let img = res.data;
+            res = await wepy.request({
+              url: httpHead + httpPort + "/user/uploadphoto",
+              method: "POST",
+              data: {
+                "phone": this.phone,
+                "photoImageValue": img,
+              }
+            })
+          }
           wx.navigateBack();
           wx.showToast({
             title: '发布成功',
             icon: 'none'
           })
-        }else{
+        } else {
           wx.showToast({
             title: '发布失败',
             icon: 'none'
           })
         }
         this.$apply();
-      }catch (e){
+      } catch (e) {
         console.log(e);
       }
     }
-
     async updatePublish(value) {
-      try{
-        let imgs = [];
+      try {
         let res = await wepy.request({
           url: httpHead + httpPort + "/service/modify",
           method: "POST",
@@ -271,25 +311,22 @@
           }
         });
         console.log(res.data);
-        if (res.data.status === 0){
+        if (res.data.status === 0) {
           wx.navigateBack();
           wx.showToast({
             title: '更新成功',
             icon: 'none'
           })
-        }else{
+        } else {
           wx.showToast({
             title: '更新失败',
             icon: 'none'
           })
         }
         this.$apply();
-      }catch (e){
+      } catch (e) {
         console.log(e);
       }
     }
-
-
-
   }
 </script>

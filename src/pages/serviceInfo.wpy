@@ -22,10 +22,15 @@
         </view>
       </view>
     </view>
-    <scroll-view scroll-y style="height: 45vh; background-color: #ebebeb; margin-top: 25rpx">
+    <scroll-view scroll-y style="height: 35vh; background-color: #ebebeb; margin-top: 25rpx">
         <view style="font-size: 35rpx; font-weight: bold; margin: 15rpx;">{{service.title}}</view>
         <view style="font-size: 30rpx; margin: 15rpx;">{{service.slogan}}</view>
     </scroll-view>
+    <view style="background-color: #ebebeb; display: flex; flex-direction: row; margin-top: 10rpx">
+      <repeat for="{{imgArray}}">
+        <image src="{{item.picture}}" mode="scaleToFill" style="margin: 10rpx; width: 160rpx; height: 160rpx" />
+      </repeat>
+    </view>
     <view style="width:100%; font-size: 30rpx; background-color: #ebebeb; margin-top: 25rpx">发布日期：{{service.datetime}}</view>
   </view>
 </template>
@@ -46,6 +51,7 @@
     data = {
       service: null,
       index: -1,
+      imgArray: [],
     }
 
     computed = {
@@ -74,9 +80,20 @@
 
     }
 
-    onLoad(param, data) {
+    async onLoad(param, data) {
         this.service = data.preload.service;
         this.index = data.preload.index;
+        try {
+          let res = await wepy.request({
+            url: httpHead + httpPort + "/service/getpicture",
+            data: {id: this.service.id}
+          })
+          this.imgArray = res.data;
+          console.log(res)
+        }catch(e){
+
+        }
+        this.$apply();
     }
   }
 </script>

@@ -1,68 +1,67 @@
 <style lang="less">
-.service-type{
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  border-style: solid;
-  border-bottom-style: none;
-  border-width: 2rpx;
-  border-color: darkgrey;
-}
-
-.service-type-label{
-  width: 500rpx;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-}
-
+  .service-type {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border-style: solid;
+    border-bottom-style: none;
+    border-width: 2rpx;
+    border-color: darkgrey;
+  }
+  .service-type-label {
+    width: 500rpx;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
 </style>
-<template>
-  <view style="display: flex; flex-direction: column; align-items: center">
-    <view style="width:750rpx; border-bottom: solid; border-bottom-width: 2rpx; border-top: solid; border-top-width: 2rpx; border-color: darkgrey; margin-top: 15rpx">
-      <view @tap="location" style="background-color: lightgrey;border-radius: 10rpx; margin-top:15rpx; margin-left: 25rpx; margin-bottom:15rpx; text-align:center; width: 700rpx">{{location === null || location.name === undefined ? "自动定位中..." : (location.address + location.name)}}</view>
-    </view>
-    <view style="margin-top: 20rpx">
-      <repeat  for="{{labels}}" key="index" index="index" item="item">
-        <view class="service-type">
-          <view style="margin-left: 15rpx; width: 200rpx">{{item.type}}</view>
-          <view class="service-type-label">
-            <repeat for="{{item.serviceLabel}}" key="index" index="indexin" item="itemin">
-              <view style="border-style: solid; color: red; border-color: red;border-width: 2rpx; margin-left: 10rpx; margin-top: 10rpx; margin-bottom: 10rpx; border-radius:20rpx;"
-                    id="{{itemin.id}}" data-item="{{itemin}}" @tap="open">
-                <view style="text-align:center; font-size:35rpx; margin: 10rpx">{{itemin.type}}</view>
-              </view>
-            </repeat>
-          </view>
-        </view>
-      </repeat>
-    </view>
-  </view>
 
-  <modal hidden="{{showThirdLabelModal}}" title="选择具体项"  bindcancel="thirdLabelCancel" bindconfirm="thirdLabelConfirm">
-    <radio-group class="radio-group" bindchange="thirdLabelRadioChange">
-      <repeat for="{{thirdLabelList}}">
-        <radio value="{{item.id}}" checked="{{item.checked}}"/>{{item.type}}
-      </repeat>
-    </radio-group>
-  </modal>
+<template>
+  <view>
+    <view style="display: flex; flex-direction: column; align-items: center">
+      <view style="width:750rpx; border-bottom: solid; border-bottom-width: 2rpx; border-top: solid; border-top-width: 2rpx; border-color: darkgrey; margin-top: 15rpx">
+        <view @tap="location" style="background-color: lightgrey;border-radius: 10rpx; margin-top:15rpx; margin-left: 25rpx; margin-bottom:15rpx; text-align:center; width: 700rpx">{{location === null || location.name === undefined ? "自动定位中..." : (location.address + location.name)}}</view>
+      </view>
+      <view style="margin-top: 20rpx">
+        <repeat for="{{labels}}" key="index" index="index" item="item">
+          <view class="service-type">
+            <view style="margin-left: 15rpx; width: 200rpx">{{item.type}}</view>
+            <view class="service-type-label">
+              <repeat for="{{item.serviceLabel}}" key="index" index="indexin" item="itemin">
+                <view style="border-style: solid; color: red; border-color: red;border-width: 2rpx; margin-left: 10rpx; margin-top: 10rpx; margin-bottom: 10rpx; border-radius:20rpx;" id="{{itemin.id}}" data-item="{{itemin}}" @tap="open">
+                  <view style="text-align:center; font-size:35rpx; margin: 10rpx">{{itemin.type}}</view>
+                </view>
+              </repeat>
+            </view>
+          </view>
+        </repeat>
+      </view>
+    </view>
+    <modal hidden="{{showThirdLabelModal}}" title="选择具体项" bindcancel="thirdLabelCancel" bindconfirm="thirdLabelConfirm">
+      <radio-group class="radio-group" bindchange="thirdLabelRadioChange">
+        <repeat for="{{thirdLabelList}}">
+          <radio value="{{item.id}}" checked="{{item.checked}}" />{{item.type}}
+        </repeat>
+      </radio-group>
+    </modal>
+  </view>
 </template>
 
 <script>
   import wepy from 'wepy'
   import TopBar from '../components/topBar'
-  import {httpHead, httpPort} from "../const/properties";
+  import {
+    httpHead,
+    httpPort
+  } from "../const/properties";
   import labels from "../const/labels";
-
   export default class FindService extends wepy.page {
     config = {
       navigationBarTitleText: '找服务'
     }
-
     components = {
       TopBar: TopBar
     }
-
     data = {
       location: null,
       labels: labels,
@@ -70,13 +69,10 @@
       thirdLabelList: [],
       showThirdLabelModal: true,
     }
-
     computed = {
-
     }
-
     methods = {
-      async location(){
+      async location() {
         try {
           let location = await wepy.chooseLocation();
           if (location.name === undefined)
@@ -89,72 +85,61 @@
           console.log(e);
         }
       },
-
       thirdLabelCancel() {
         this.showThirdLabelModal = true;
       },
-
-      async thirdLabelConfirm(){
+      async thirdLabelConfirm() {
         this.showThirdLabelModal = true;
         let lot = this.$parent.globalData.location.longitude;
         let lat = this.$parent.globalData.location.latitude;
-        try{
+        try {
           let res = await wepy.request({
             url: httpHead + httpPort + "/service/findbylabelandlocation",
-            data:{
+            data: {
               labelid: this.labelSelectedId,
               longitude: lot,
               latitude: lat,
             }
           })
           console.log(res);
-          this.$parent.globalData.service = res.data.map((item, index)=>{
+          let services = res.data.map((item, index) => {
             item.distance = this.$parent.getFlatternDistance(item.latitude, item.longitude, lat, lot);
             return item;
-          }).sort((a, b)=>{
+          }).sort((a, b) => {
             return a.distance > b.distance;
           });
-
-          // for (let i = 0;i<this.$parent.globalData.service.length;i++){
-          //   let img = await wepy.request({
-          //     url: httpHead + httpPort + "/user/getphotobyid",
-          //     data: {
-          //       id: this.$parent.globalData.service[i].id
-          //     }
-          //   })
-          //   console.log(img);
-          // }
+          for (let i = 0; i < services.length; i++) {
+            services[i].pic = await wepy.request({
+              url: httpHead + httpPort + "/user/getphoto",
+              data: {
+                "phone": services[i].phone
+              }
+            })
+          }
+          this.$parent.globalData.service = services;
           this.$apply();
           wx.switchTab({
             url: "./findMan"
           })
-        }catch (e)
-        {
+        } catch (e) {
           console.log(e);
         }
       },
-
-      thirdLabelRadioChange(e){
+      thirdLabelRadioChange(e) {
         let id = e.detail.value;
         this.labelSelectedId = id;
         console.log(id);
       },
-
-      open(e){
+      open(e) {
         console.log(e.target);
         let item = e.currentTarget.dataset.item;
         this.thirdLabelList = item.thirdLabel;
         this.showThirdLabelModal = false;
       }
     }
-
     events = {
-
     }
-
     onLoad() {
-
     }
-
   }
 </script>

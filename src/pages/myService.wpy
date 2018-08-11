@@ -1,55 +1,64 @@
 <style lang="less">
 
 </style>
+
 <template>
   <view style="text-align: center">
     <view style="display: flex; flex-direction: row; ">
-      <button style="border: solid; width: 375rpx; border-radius: 10rpx; border-color: aliceblue"
-              open-type="getUserInfo" size="mini" @tap="bindPhone">绑定手机
-      </button>
-      <button style="border: solid; width: 375rpx; border-radius: 10rpx; border-color: aliceblue" size="mini"
-              @tap="newPublish">发布新广告
-      </button>
+      <button style="border: solid; width: 375rpx; border-radius: 10rpx; border-color: aliceblue" open-type="getUserInfo" size="mini" @tap="bindPhone">绑定手机
+              </button>
+      <button style="border: solid; width: 375rpx; border-radius: 10rpx; border-color: aliceblue" size="mini" @tap="newPublish">发布新广告
+              </button>
     </view>
     <view>
       我发布的服务
     </view>
     <repeat for="{{services}}">
-      <view
-        style="display: flex; flex-direction: row; background-color: #ebebeb; margin-top: 20rpx; margin-left: 25rpx; width: 700rpx;">
-        <view style="width: 650rpx; display:flex; flex-direction:column; align-items: left" @tap="serviceInfo"
-              data-service="{{item}}" data-index="{{index}}">
-          <view style="font-size: 35rpx">类别:{{item.serviceLabelName}}</view>
-          <view style="font-size: 35rpx">标题:{{item.title}}</view>
-          <view style="font-size: 35rpx">发布时间:{{item.datetime}}</view>
+      <view style="font-size:30rpx; text-align: left; margin-left: 15rpx">{{item.serviceLabelName + '>' + item.serviceLabelName}}</view>
+      <view style="display: flex; flex-direction: row; background-color: #ebebeb; width: 750rpx;">
+        <view style="width: 650rpx; display:flex; flex-direction:column; align-items: left" data-service="{{item}}" data-index="{{index}}">
+          <scroll-view scroll-y style="height: 20vh; background-color: #ebebeb; margin-top: 25rpx">
+            <view style="text-align: left">
+              <view style="font-size: 35rpx; font-weight: bold; margin-left: 15rpx;">{{item.title}}</view>
+              <view style="font-size: 30rpx; margin-left: 15rpx;">{{item.slogan}}</view>
+            </view>
+          </scroll-view>
         </view>
-        <view style="width: 150rpx; display: flex; flex-direction:column; align-items: right">
-          <view style="font-size:30rpx" data-service="{{item}}" data-index="{{index}}" @tap="updateService">修改广告</view>
-          <view style="font-size:30rpx; margin-top: 20rpx" data-service="{{item}}" data-index="{{index}}"
-                @tap="deleteService">删除广告
+      </view>
+      <view style="display: flex; flex-direction: row; background-color: #ebebeb; width: 750rpx; margin-top: 10rpx">
+        <view style="width: 650rpx; display:flex; flex-direction:column;">
+          <view style="background-color: #ebebeb; display: flex; flex-direction: row; margin-top: 10rpx">
+            <repeat for="{{item.imgArray}}" item="iitem">
+              <image src="{{iitem.picture}}" mode="scaleToFill" style="margin: 10rpx; width: 160rpx; height: 160rpx" />
+            </repeat>
+          </view>
+          <view style="width: 100%; display: flex; flex-direction:row;">
+            <view style="font-size:30rpx; margin: 10rpx; background-color: #000000; color: #ffffff; border-radius: 15rpx">已发布:{{item.days}}天</view>
+            <view style="width:200rpx" />
+            <view style="font-size:30rpx; margin: 10rpx; background-color: #000000; color: #ffffff; border-radius: 15rpx" data-service="{{item}}" data-index="{{index}}" @tap="updateService">修改广告</view>
+            <view style="font-size:30rpx; margin: 10rpx; background-color: #000000; color: #ffffff; border-radius: 15rpx" data-service="{{item}}" data-index="{{index}}" @tap="deleteService">删除广告</view>
           </view>
         </view>
       </view>
     </repeat>
   </view>
-
 </template>
 
 <script>
   import wepy from 'wepy'
-  import {httpHead, httpPort} from "../const/properties";
+  import {
+    httpHead,
+    httpPort
+  } from "../const/properties";
   import moment from 'moment'
-
   export default class MyService extends wepy.page {
     config = {
       navigationBarTitleText: '我提供的服务'
     }
-
     data = {
       services: [],
       phone: null,
     }
-
     methods = {
       serviceInfo(e) {
         console.log(e);
@@ -60,7 +69,6 @@
           url: "./serviceInfo"
         })
       },
-
       async bindPhone() {
         try {
           let res = await wepy.getUserInfo();
@@ -79,7 +87,6 @@
             url: "bindPhone"
           })
         }
-
       },
       newPublish() {
         if (!this.$parent.checkUserState(2)) {
@@ -89,7 +96,6 @@
           url: "newPublish"
         })
       },
-
       updateService(e) {
         console.log(e);
         let dataset = e.currentTarget.dataset;
@@ -98,7 +104,6 @@
           url: "./newPublish"
         })
       },
-
       async deleteService(e) {
         try {
           let dataset = e.currentTarget.dataset;
@@ -109,7 +114,9 @@
           if (res.confirm) {
             res = await wepy.request({
               url: httpHead + httpPort + "/service/remove",
-              data: {serviceid: dataset.service.id}
+              data: {
+                serviceid: dataset.service.id
+              }
             })
             if (res.data.status === 0) {
               wx.showToast({
@@ -122,14 +129,11 @@
             console.log(res);
             console.log(dataset);
           }
-        } catch (e) {
-
-        }
+        } catch (e) {}
       }
     }
-
     onShow() {
-      this.uploadPhoto();
+      // this.uploadPhoto();
       if (!this.$parent.checkUserState(2)) {
         this.phone = null;
         return;
@@ -137,32 +141,6 @@
       this.phone = this.$parent.globalData.user.phone;
       this.findUserService(this.$parent.globalData.user.id);
     }
-
-    async uploadPhoto(){
-      try{
-        // console.log(this.$parent.globalData.userInfo.avatarUrl)
-        // let img = await wepy.request({
-        //   url: this.$parent.globalData.userInfo.avatarUrl,
-        //   method:'GET',
-        //   responseType: 'arraybuffer',
-        // })
-        // console.log(img)
-        // let base64 ='data:image/jpg;base64,'+ wx.arrayBufferToBase64(img);
-        // console.log(base64);
-        let res = await wepy.request({
-          url: httpHead + httpPort + "/user/uploadphoto",
-          method: "POST",
-          data:{
-            "phone": this.$parent.globalData.user.phone,
-            "photoImageValue": this.$parent.globalData.userInfo.avatarUrl,
-          }
-        })
-        console.log(res);
-      }catch (e){
-
-      }
-    }
-
     async findUserService(id) {
       try {
         let res = await wepy.request({
@@ -173,10 +151,18 @@
         })
         console.log(res.data);
         this.services = res.data.serviceinfoDTOList;
+        for (let i = 0; i < this.services.length; i++) {
+          let res = await wepy.request({
+            url: httpHead + httpPort + "/service/getpicture",
+            data: {
+              id: this.services[i].id
+            }
+          })
+          this.services[i].imgArray = res.data;
+          this.services[i].days = - moment(this.services[i].datetime, "YYYYMMDD").diff(moment(), 'days')
+        }
         this.$apply();
-      } catch (e) {
-
-      }
+      } catch (e) {}
     }
   }
 </script>
