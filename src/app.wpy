@@ -11,8 +11,8 @@
   export default class extends wepy.app {
     config = {
       pages: [
-        'pages/findService',
         'pages/findMan',
+        'pages/findService',
         'pages/myService',
         'pages/followMan',
         'pages/bindPhone',
@@ -21,9 +21,9 @@
       ],
       window: {
         backgroundTextStyle: 'light',
-        navigationBarBackgroundColor: '#fff',
+        navigationBarBackgroundColor: '#fe120a',
         navigationBarTitleText: 'WeChat',
-        navigationBarTextStyle: 'black'
+        navigationBarTextStyle: 'white'
       },
 
       tabBar: {

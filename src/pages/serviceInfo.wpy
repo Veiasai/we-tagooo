@@ -5,7 +5,7 @@
   <view style="display: flex; flex-direction: column; align-items: left; margin-left: 25rpx; width: 700rpx">
     <view style="font-size: 30rpx">{{service.basicLabelName}}-{{service.thirdLabelName}}</view>
     <view style="display: flex; flex-direction: row; background-color: #ebebeb; margin-top: 20rpx; ">
-      <image src="{{item.pic ? item.pic : '../resources/icons/default_pic.png'}}" style="width: 150rpx; height: 150rpx; margin: 20rpx"></image>
+      <image src="{{service.pic ? service.pic.data : '../resources/icons/default_pic.png'}}" style="width: 150rpx; height: 150rpx; margin: 20rpx"></image>
       <view style="width: 310rpx; display: flex; flex-direction: column; align-items: left">
         <view style="font-size: 30rpx">电话：{{service.phonenum ? service.phone : "未公开"}}</view>
         <view style="font-size: 30rpx">地址：{{service.address}}</view>

@@ -71,6 +71,11 @@
     events = {
     }
     onLoad() {
+      if (this.$parent.globalData.user === null) {
+        wepy.navigateTo({
+            url: "bindPhone"
+          })
+      }
     }
     onShow() {
       if (this.$parent.globalData.user !== null) {

@@ -52,10 +52,15 @@
     httpPort
   } from "../const/properties";
   export default class FindMan extends wepy.page {
+    onLoad() {
+      this.search("");
+    }
+
     onShow() {
       this.location = this.$parent.globalData.location;
       this.services = this.$parent.globalData.service;
     }
+
     config = {
       navigationBarTitleText: '找到的人'
     }
@@ -80,6 +85,9 @@
       },
       follow(e) {
         if (this.$parent.globalData.user === null) {
+          wepy.navigateTo({
+            url: "bindPhone"
+          })
           wx.showToast({
             title: '尚未登陆,功能受限',
             icon: 'none'
@@ -106,6 +114,9 @@
           }
         })
         let location = this.$parent.globalData.location;
+        if (location === null){
+          location = await wepy.getLocation();
+        }
         let lat = location.latitude;
         let lot = location.longitude;
         this.services = res.data.map((item, index) => {

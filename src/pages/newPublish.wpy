@@ -13,8 +13,7 @@
         <input value="{{defaultName}}" name="userName" placeholder="我的名字" disabled="{{id !== null}}" />
       </view>
       <view @tap="chooseLocation" style="background-color: #ebebeb; margin-top: 10rpx; display: flex; flex-direction: row; align-items: center; font-size: 35rpx">
-        <image src="../resources/icons/icon-location.png" mode="scaleToFill" style="width: 35rpx; height: 35rpx;">
-        </image>
+        <image src="../resources/icons/icon-location.png" mode="scaleToFill" style="width: 35rpx; height: 35rpx;" />
         <view>
           {{address === null ? "请选择位置" : (address.address +'\n' + address.name)}}
         </view>
@@ -40,11 +39,11 @@
         <view>在广告中公开手机号码:{{phone}} </view>
         <radio-group name="phonenum">
           <label>
-                  <radio value="1" checked="{{defaultPhone}}"/>
-                  是</label>
+                    <radio value="1" checked="{{defaultPhone}}"/>
+                    是</label>
           <label>
-                  <radio value="0" checked="{{!defaultPhone}}"/>
-                  否</label>
+                    <radio value="0" checked="{{!defaultPhone}}"/>
+                    否</label>
         </radio-group>
       </view>
       <view style="margin-top: 10rpx; display: flex; flex-direction: row; align-items: center">
@@ -96,13 +95,19 @@
           this.defaultTitle = service.title;
           this.defaultSlogan = service.slogan;
           this.defaultPhone = service.phonenum;
-          let res = await wepy.request({
-            url: httpHead + httpPort + "/user/getphoto",
-            data: {
-              phone: this.phone
-            }
-          })
-          this.userImg = res.data;
+          this.imgArray = service.imgArray.map((item)=>{
+            return item.picture;
+          });
+          try {
+            let res = await wepy.request({
+              url: httpHead + httpPort + "/user/getphoto",
+              data: {
+                phone: this.phone
+              }
+            })
+            this.userImg = res.data;
+          } catch (e) {
+          }
           this.$apply();
         }
       } catch (e) {
@@ -110,7 +115,7 @@
       }
     }
     config = {
-      navigationBarTitleText: '发布服务'
+      navigationBarTitleText: '发布服务',
     }
     components = {}
     data = {
@@ -244,6 +249,16 @@
           imgs.push(res.data)
           console.log(res);
         }
+        let userImg = '';
+        if (this.userImgChange) {
+          let res = await wepy.uploadFile({
+            url: httpHead + httpPort + "/service/postFile",
+            filePath: this.userImg,
+            name: 'file',
+          })
+          userImg = res.data;
+        }
+      
         let res = await wepy.request({
           url: httpHead + httpPort + "/service/newpublish",
           method: "POST",
@@ -256,7 +271,7 @@
             "pictureImageValue": imgs,
             "publishUserId": this.$parent.globalData.user.id,
             "publisherName": value.userName,
-            "publisherPhoto": '',
+            "publisherPhoto": userImg,
             "slogan": value.slogan,
             "thirdLabelId": this.label.id,
             "title": value.title
@@ -264,22 +279,22 @@
         });
         console.log(res.data);
         if (res.data.publishStatus === 0) {
-          if (this.userImgChange) {
-            let res = await wepy.uploadFile({
-              url: httpHead + httpPort + "/service/postFile",
-              filePath: this.userImg,
-              name: 'file',
-            })
-            let img = res.data;
-            res = await wepy.request({
-              url: httpHead + httpPort + "/user/uploadphoto",
-              method: "POST",
-              data: {
-                "phone": this.phone,
-                "photoImageValue": img,
-              }
-            })
-          }
+          // if (this.userImgChange) {
+          //   let res = await wepy.uploadFile({
+          //     url: httpHead + httpPort + "/service/postFile",
+          //     filePath: this.userImg,
+          //     name: 'file',
+          //   })
+          //   let img = res.data;
+          //   res = await wepy.request({
+          //     url: httpHead + httpPort + "/user/uploadphoto",
+          //     method: "POST",
+          //     data: {
+          //       "phone": this.phone,
+          //       "photoImageValue": img,
+          //     }
+          //   })
+          // }
           wx.navigateBack();
           wx.showToast({
             title: '发布成功',

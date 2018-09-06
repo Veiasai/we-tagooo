@@ -90,6 +90,13 @@
       },
       newPublish() {
         if (!this.$parent.checkUserState(2)) {
+          wepy.navigateTo({
+            url: "bindPhone"
+          })
+          wx.showToast({
+            title: '尚未登陆,功能受限',
+            icon: 'none'
+          })
           return;
         }
         wepy.navigateTo({
@@ -130,6 +137,13 @@
             console.log(dataset);
           }
         } catch (e) {}
+      }
+    }
+    onLoad() {
+      if (this.$parent.globalData.user === null) {
+        wepy.navigateTo({
+            url: "bindPhone"
+          })
       }
     }
     onShow() {
