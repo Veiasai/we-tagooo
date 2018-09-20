@@ -20,7 +20,7 @@
   <view>
     <view style="display: flex; flex-direction: column; align-items: center">
       <view style="width:750rpx; border-bottom: solid; border-bottom-width: 2rpx; border-top: solid; border-top-width: 2rpx; border-color: darkgrey; margin-top: 15rpx">
-        <view @tap="location" style="background-color: lightgrey;border-radius: 10rpx; margin-top:15rpx; margin-left: 25rpx; margin-bottom:15rpx; text-align:center; width: 700rpx">{{location === null || location.name === undefined ? "自动定位中..." : (location.address + location.name)}}</view>
+        <view @tap="location" style="background-color: lightgrey;border-radius: 10rpx; margin-top:15rpx; margin-left: 25rpx; margin-bottom:15rpx; text-align:center; width: 700rpx">{{location === null || location.name === undefined ? "自动定位中..." : (location.name)}}</view>
       </view>
       <view style="margin-top: 20rpx">
         <repeat for="{{labels}}" key="index" index="index" item="item">
@@ -37,7 +37,7 @@
         </repeat>
       </view>
     </view>
-    <modal hidden="{{showThirdLabelModal}}" title="选择具体项" bindcancel="thirdLabelCancel" bindconfirm="thirdLabelConfirm">
+    <modal wx:if="{{!showThirdLabelModal}}" title="选择具体项" bindcancel="thirdLabelCancel" bindconfirm="thirdLabelConfirm">
       <radio-group class="radio-group" bindchange="thirdLabelRadioChange">
         <repeat for="{{thirdLabelList}}">
           <radio value="{{item.id}}" checked="{{item.checked}}" />{{item.type}}
@@ -140,6 +140,9 @@
     events = {
     }
     onLoad() {
+    }
+    onShow(){
+      this.location = this.$parent.globalData.location;
     }
   }
 </script>

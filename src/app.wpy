@@ -1,12 +1,14 @@
 <style lang="less">
   @import './resources/weui.wxss';
-
 </style>
 
 <script>
   import wepy from 'wepy'
   import 'wepy-async-function'
-  import {httpPort, httpHead} from './const/properties'
+  import {
+    httpPort,
+    httpHead
+  } from './const/properties'
 
   export default class extends wepy.app {
     config = {
@@ -25,18 +27,17 @@
         navigationBarTitleText: 'WeChat',
         navigationBarTextStyle: 'white'
       },
-
       tabBar: {
-        "color":"#ffffff",
-        "selectedColor":"#ffffff",
+        "color": "#ffffff",
+        "selectedColor": "#000000",
         "backgroundColor": "#fe120a",
         "borderStyle": "white",
         "list": [{
-          "selectedIconPath": "./resources/icons/searchS.png",
-          "iconPath": "./resources/icons/search.png",
-          "pagePath": "pages/findService",
-          "text": "找服务"
-        },
+            "selectedIconPath": "./resources/icons/searchS.png",
+            "iconPath": "./resources/icons/search.png",
+            "pagePath": "pages/findService",
+            "text": "找服务"
+          },
           {
             "selectedIconPath": "./resources/icons/teamS.png",
             "iconPath": "./resources/icons/team.png",
@@ -58,30 +59,25 @@
         ]
       }
     }
-
     globalData = {
       location: null,
       service: [],
       user: null,
-        // {id: "4028815e5dd036b7015dd037e3930000"},
+      // {id: "4028815e5dd036b7015dd037e3930000"},
       // 1 未绑定手机号， 2 成功获取UserId
       userState: 1,
-      userInfo:null,
+      userInfo: null,
       followServices: [],
     }
-
     constructor() {
       super();
       this.use('requestfix');
       this.use('promisify');
     }
-
     onLaunch() {
       this.userState = 1;
       this.login();
-      this.getLocation();
     }
-
     // 通用方法
     checkUserState(state) {
       if (this.globalData.userState === state)
@@ -94,46 +90,33 @@
       }
       return false;
     }
-
-    async getLocation(){
-      let res = await wepy.getLocation();
-      this.globalData.location = res;
-      console.log(res);
-    }
-
-    getRad(d){
+    
+    getRad(d) {
       let PI = Math.PI;
-      return d*PI/180.0;
+      return d * PI / 180.0;
     }
-
-    getFlatternDistance(lat1,lng1,lat2,lng2){
-      let EARTH_RADIUS = 6378137.0;    //单位M
-      let f = this.getRad((lat1 + lat2)/2);
-      let g = this.getRad((lat1 - lat2)/2);
-      let l = this.getRad((lng1 - lng2)/2);
-
+    getFlatternDistance(lat1, lng1, lat2, lng2) {
+      let EARTH_RADIUS = 6378137.0; //单位M
+      let f = this.getRad((lat1 + lat2) / 2);
+      let g = this.getRad((lat1 - lat2) / 2);
+      let l = this.getRad((lng1 - lng2) / 2);
       let sg = Math.sin(g);
       let sl = Math.sin(l);
       let sf = Math.sin(f);
-
-      let s,c,w,r,d,h1,h2;
+      let s, c, w, r, d, h1, h2;
       let a = EARTH_RADIUS;
-      let fl = 1/298.257;
-
-      sg = sg*sg;
-      sl = sl*sl;
-      sf = sf*sf;
-
-      s = sg*(1-sl) + (1-sf)*sl;
-      c = (1-sg)*(1-sl) + sf*sl;
-
-      w = Math.atan(Math.sqrt(s/c));
-      r = Math.sqrt(s*c)/w;
-      d = 2*w*a;
-      h1 = (3*r -1)/2/c;
-      h2 = (3*r +1)/2/s;
-
-      let re = (d*(1 + fl*(h1*sf*(1-sg) - h2*(1-sf)*sg))/1000).toFixed(2);
+      let fl = 1 / 298.257;
+      sg = sg * sg;
+      sl = sl * sl;
+      sf = sf * sf;
+      s = sg * (1 - sl) + (1 - sf) * sl;
+      c = (1 - sg) * (1 - sl) + sf * sl;
+      w = Math.atan(Math.sqrt(s / c));
+      r = Math.sqrt(s * c) / w;
+      d = 2 * w * a;
+      h1 = (3 * r - 1) / 2 / c;
+      h2 = (3 * r + 1) / 2 / s;
+      let re = (d * (1 + fl * (h1 * sf * (1 - sg) - h2 * (1 - sf) * sg)) / 1000).toFixed(2);
       return isNaN(re) ? 0 : re;
     }
     async follow(item, id) {
@@ -152,12 +135,10 @@
           }
         })
         console.log(res);
-      }catch (e)
-      {
+      } catch (e) {
         console.log(e);
       }
     }
-
     async followRemove(item) {
       try {
         let res = await wepy.request({
@@ -173,31 +154,28 @@
           }
         })
         console.log(res);
-      }catch (e)
-      {
+      } catch (e) {
         console.log(e);
       }
     }
-
-    async login(){
+    async login() {
       try {
         let res = await wepy.getUserInfo();
         this.globalData.userInfo = res.userInfo;
-      }catch (e){
+      } catch (e) {
         return;
       }
-
-      try{
+      try {
         let res = await wepy.login();
         let code = res.code;
         res = await wepy.request({
           url: httpHead + httpPort + "/user/wechatlogin",
-          data:{
+          data: {
             code: code,
           }
         })
         console.log(res);
-        if (res.data.status === 200){
+        if (res.data.status === 200) {
           wx.showToast({
             title: '自动登陆成功',
             icon: 'none'
@@ -205,13 +183,13 @@
           this.globalData.user = res.data;
           this.globalData.userState = 2;
           console.log(res.data);
-        }else{
+        } else {
           wx.showToast({
             title: '获取用户信息失败，未绑定手机',
             icon: 'none'
           })
         }
-      }catch (e){
+      } catch (e) {
         console.log(e);
       }
     }

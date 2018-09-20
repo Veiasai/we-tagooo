@@ -1,6 +1,7 @@
 <style lang="less">
 
 </style>
+
 <template>
   <view style="display: flex; flex-direction: column; align-items: left; margin-left: 25rpx; width: 700rpx">
     <view style="font-size: 30rpx">{{service.basicLabelName}}-{{service.thirdLabelName}}</view>
@@ -15,16 +16,13 @@
         <view style="font-size: 30rpx;">{{service.certification ? '工商户认证' : '未认证'}}</view>
         <view @tap="follow" style="display: flex; align-items: center">
           <view style="font-size: 30rpx;">关注</view>
-          <image
-            mode="aspectFit"
-            style="width: 40rpx; height: 38rpx"
-            src="{{service.follow ? '../resources/icons/follow-2.png' : '../resources/icons/follow-1.png'}}"></image>
+          <image mode="aspectFit" style="width: 40rpx; height: 38rpx" src="{{service.follow ? '../resources/icons/follow-2.png' : '../resources/icons/follow-1.png'}}"></image>
         </view>
       </view>
     </view>
     <scroll-view scroll-y style="height: 35vh; background-color: #ebebeb; margin-top: 25rpx">
-        <view style="font-size: 35rpx; font-weight: bold; margin: 15rpx;">{{service.title}}</view>
-        <view style="font-size: 30rpx; margin: 15rpx;">{{service.slogan}}</view>
+      <view style="font-size: 35rpx; font-weight: bold; margin: 15rpx;">{{service.title}}</view>
+      <view style="font-size: 30rpx; margin: 15rpx;">{{service.slogan}}</view>
     </scroll-view>
     <view style="background-color: #ebebeb; display: flex; flex-direction: row; margin-top: 10rpx">
       <repeat for="{{imgArray}}">
@@ -37,63 +35,67 @@
 
 <script>
   import wepy from 'wepy'
-  import {httpHead, httpPort} from "../const/properties";
-
+  import {
+    httpHead,
+    httpPort
+  } from "../const/properties";
   export default class ServiceInfo extends wepy.page {
     config = {
       navigationBarTitleText: '服务详情'
     }
-
     components = {
-
     }
-
+    onShareAppMessage(res) {
+      if (res.from === 'button') {
+        // 来自页面内转发按钮
+        console.log(res.target)
+      }
+      return {
+        title: '服务标签',
+        path: '/pages/findMan?service=' +  JSON.stringify(this.service)
+      }
+    }
     data = {
       service: null,
       index: -1,
       imgArray: [],
     }
-
     computed = {
-
     }
-
     methods = {
-      follow(){
-        if (this.$parent.globalData.user === null){
+      follow() {
+        if (this.$parent.globalData.user === null) {
           wx.showToast({
             title: '尚未登陆,功能受限',
             icon: 'none'
           })
           return;
         }
-        if (this.service.follow){
+        if (this.service.follow) {
           this.$parent.followRemove(this.service);
-        }else{
+        } else {
           this.$parent.follow(this.service);
         }
         this.service.follow = !this.service.follow;
       }
     }
-
     events = {
-
     }
-
     async onLoad(param, data) {
-        this.service = data.preload.service;
-        this.index = data.preload.index;
-        try {
-          let res = await wepy.request({
-            url: httpHead + httpPort + "/service/getpicture",
-            data: {id: this.service.id}
-          })
-          this.imgArray = res.data;
-          console.log(res)
-        }catch(e){
-
-        }
-        this.$apply();
+      console.log(param)
+      this.service = data.preload.service;
+      try {
+        let res = await wepy.request({
+          url: httpHead + httpPort + "/service/getpicture",
+          data: {
+            id: this.service.id
+          }
+        })
+        this.imgArray = res.data;
+        console.log(res)
+      } catch (e) {
+      }
+      this.$apply();
     }
   }
 </script>

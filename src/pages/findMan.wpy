@@ -5,14 +5,14 @@
 <template>
   <view style="display: flex; flex-direction: column; align-items: center">
     <view style="width:750rpx; border-bottom: solid; border-bottom-width: 2rpx; border-top: solid; border-top-width: 2rpx; border-color: darkgrey; margin-top: 15rpx">
-      <view style="background-color: lightgrey;border-radius: 10rpx; margin-top:15rpx; margin-left: 25rpx; margin-bottom:15rpx; text-align:center; width: 700rpx">{{location === null || location.name === undefined ? "自动定位中..." : (location.address + location.name + "附近")}}
+      <view @tap="location" style="background-color: lightgrey;border-radius: 10rpx; margin-top:15rpx; margin-left: 25rpx; margin-bottom:15rpx; text-align:center; width: 700rpx">{{location === null || location.name === undefined ? "自动定位中..." : (location.name)}}
       </view>
     </view>
     <view style="border-bottom: solid; border-bottom-width: 2rpx; border-color: darkgrey; width:750rpx">
       <form bindsubmit="formSubmit" bindreset="formReset">
         <view style="display: flex; flex-direction: row; width: 700rpx; margin: 15rpx; align-items: center">
           <view style="border: solid;border-color: dimgrey; width: 500rpx; border-width: 3rpx; border-radius: 20rpx; margin-left:20rpx">
-            <input name="name" placeholder="按名字查找服务" />
+            <input name="name" placeholder="关键词查找" />
           </view>
           <view style="height: 60rpx; margin-left: 15rpx; border-radius: 20rpx">
             <button size="mini" style="font-size:30rpx; " formType="submit">查找</button>
@@ -24,9 +24,12 @@
       <repeat for="{{services}}">
         <view style="display: flex; flex-direction: row; background-color: #ebebeb; margin-top: 20rpx; margin-left:25rpx; width: 750rpx; height: 190rpx">
           <image src="{{item.pic ? item.pic.data : '../resources/icons/default_pic.png'}}" style="width: 150rpx; height: 150rpx; margin: 20rpx" />
-          <view @tap="serviceInfo" data-service="{{item}}" data-index="{{index}}" style="width: 310rpx; align-items: left; margin: 10rpx">
-            <view style="font-size: 40rpx; font-weight: bold">{{item.name}}</view>
-            <view style="font-size: 35rpx;">{{item.title}}</view>
+          <view  style="width: 310rpx; align-items: left; margin: 10rpx">
+            <view style="display: flex; flex-direction: row;">
+              <view style="font-size: 40rpx; font-weight: bold">{{item.name}}</view>
+              <image @tap="call" style="width: 50rpx; height: 50rpx; margin: 10rpx"  data-service="{{item}}" src="../resources/icons/phone.png"/>
+            </view>
+            <view @tap="serviceInfo" data-service="{{item}}" data-index="{{index}}" style="font-size: 35rpx;">{{item.title}}</view>
           </view>
           <view style="width: 200rpx; display: flex; flex-direction:column; align-items: right">
             <view style="margin-top:10rpx; font-size: 27rpx">{{item.distance}}千米</view>
@@ -51,16 +54,24 @@
     httpHead,
     httpPort
   } from "../const/properties";
+  var QQMapWX = require('../mixins/qqmap-wx-jssdk.min.js');
   export default class FindMan extends wepy.page {
-    onLoad() {
+    onLoad(param) {
+      if (param.service !== undefined) {
+        this.$preload("service", JSON.parse(param.service));
+        this.$navigate({
+          url: "./serviceInfo"
+        })
+      }
+      this.getLocation();
       this.search("");
     }
-
     onShow() {
+      if (this.$parent.globalData.service){
+        this.services = this.$parent.globalData.service;
+      }
       this.location = this.$parent.globalData.location;
-      this.services = this.$parent.globalData.service;
     }
-
     config = {
       navigationBarTitleText: '找到的人'
     }
@@ -69,6 +80,32 @@
       services: [],
     }
     methods = {
+      async call(e) {
+        let service = e.currentTarget.dataset.service;
+        if (service.phonenum){
+          wx.makePhoneCall({
+            phoneNumber: service.phone
+          })
+        }else{
+          wx.showToast({
+            title: '该服务未公开手机',
+            icon: 'none'
+          })
+        }
+      },
+      async location() {
+        try {
+          let location = await wepy.chooseLocation();
+          if (location.name === undefined)
+            return;
+          console.log("location", location)
+          this.$parent.globalData.location = location;
+          this.location = location;
+          this.$apply();
+        } catch (e) {
+          console.log(e);
+        }
+      },
       formSubmit(e) {
         console.log('form发生了submit事件，携带数据为：', e.detail.value)
         let value = e.detail.value;
@@ -113,19 +150,17 @@
             word: value
           }
         })
-        let location = this.$parent.globalData.location;
-        if (location === null){
+        let location = this.location;
+        if (location === null)
           location = await wepy.getLocation();
-        }
         let lat = location.latitude;
         let lot = location.longitude;
         this.services = res.data.map((item, index) => {
           item.distance = this.$parent.getFlatternDistance(item.latitude, item.longitude, lat, lot);
           return item;
         }).sort((a, b) => {
-          return a.distance > b.distance;
+          return a.distance < b.distance;
         });
-        
         for (let i = 0; i < this.services.length; i++) {
           this.services[i].pic = await wepy.request({
             url: httpHead + httpPort + "/user/getphoto",
@@ -134,10 +169,32 @@
             }
           })
         }
-        console.log(this.services);
         this.$parent.globalData.service = this.services;
+        console.log(this.services);
         this.$apply();
       } catch (e) {}
+    }
+    async getLocation() {
+      let qqmapsdk = new QQMapWX({
+        key: 'JKNBZ-CKHAU-L6JVQ-24SIQ-A2AM2-4YFCU'
+      });
+      let res = await wepy.getLocation();
+      qqmapsdk.reverseGeocoder({
+        location: {
+          latitude: res.latitude,
+          longitude: res.longitude
+        },
+        success: (addressRes) => {
+          var address = addressRes.result.formatted_addresses.recommend;
+          res.name = address;
+          this.$parent.globalData.location = res;
+          this.location = res;
+          this.$apply();
+        },
+        fail: function(res) {
+          console.log(res);
+        },
+      })
     }
   }
 </script>
