@@ -14,8 +14,8 @@
       我发布的服务
     </view>
     <repeat for="{{services}}">
-      <view style="font-size:30rpx; text-align: left; margin-left: 15rpx">{{item.serviceLabelName + '>' + item.serviceLabelName}}</view>
-      <view style="display: flex; flex-direction: row; background-color: #ebebeb; width: 750rpx;">
+      <view style="font-size:30rpx; text-align: left; margin-left: 15rpx">{{item.basicLabelName + '>' + item.serviceLabelName + '>' + item.thirdLabelName}}</view>
+      <view @tap="serviceInfo" data-service="{{item}}" style="display: flex; flex-direction: row; background-color: #ebebeb; width: 750rpx;">
         <view style="width: 650rpx; display:flex; flex-direction:column; align-items: left" data-service="{{item}}" data-index="{{index}}">
           <scroll-view scroll-y style="height: 20vh; background-color: #ebebeb; margin-top: 25rpx">
             <view style="text-align: left">
@@ -60,11 +60,22 @@
       phone: null,
     }
     methods = {
-      serviceInfo(e) {
+      async serviceInfo(e) {
         console.log(e);
         let dataset = e.currentTarget.dataset;
+        let location = await wepy.getLocation();
+        let lat = location.latitude;
+        let lot = location.longitude;
+        dataset.service.distance = this.$parent.getFlatternDistance(dataset.service.latitude, dataset.service.longitude, lat, lot);
+        dataset.service.pic = await wepy.request({
+            url: httpHead + httpPort + "/user/getphoto",
+            data: {
+              "phone": dataset.service.phone
+            }
+          })
         this.$preload("service", dataset.service);
-        this.$preload("index", dataset.index);
+        this.$preload("report", false);
+        this.$preload("follow", false);
         this.$navigate({
           url: "./serviceInfo"
         })

@@ -135,6 +135,7 @@
       address: null,
       imgArray: [],
       label: null,
+      lock: 0,
     }
     computed = {}
     methods = {
@@ -238,6 +239,9 @@
       }
     }
     async publish(value) {
+      if (this.lock === 1)
+        return;
+      this.lock = 1;
       try {
         let imgs = [];
         for (let i = 0; i < this.imgArray.length; i++) {
@@ -300,16 +304,23 @@
             title: '发布成功',
             icon: 'none'
           })
+          this.$preload("service", res.data);
+          this.$preload("report", false);
+          this.$preload("follow", false);
+          this.$navigate({
+          url: "./serviceInfo"
+        })
         } else {
           wx.showToast({
             title: '发布失败',
             icon: 'none'
           })
         }
-        this.$apply();
       } catch (e) {
         console.log(e);
       }
+      this.lock=0;
+      this.$apply();
     }
     async updatePublish(value) {
       try {

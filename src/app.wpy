@@ -36,7 +36,7 @@
             "selectedIconPath": "./resources/icons/searchS.png",
             "iconPath": "./resources/icons/search.png",
             "pagePath": "pages/findService",
-            "text": "找服务"
+            "text": "找人服务我"
           },
           {
             "selectedIconPath": "./resources/icons/teamS.png",

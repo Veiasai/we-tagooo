@@ -6,15 +6,19 @@
   <view style="display: flex; flex-direction: column; align-items: left; margin-left: 25rpx; width: 700rpx">
     <view style="font-size: 30rpx">{{service.basicLabelName}}-{{service.thirdLabelName}}</view>
     <view style="display: flex; flex-direction: row; background-color: #ebebeb; margin-top: 20rpx; ">
-      <image src="{{service.pic ? service.pic.data : '../resources/icons/default_pic.png'}}" style="width: 150rpx; height: 150rpx; margin: 20rpx"></image>
+      <image @tap="preview" data-list="{{[service.pic ? service.pic.data : '../resources/icons/default_pic.png']}}" data-src="{{service.pic ? service.pic.data : '../resources/icons/default_pic.png'}}" src="{{service.pic ? service.pic.data : '../resources/icons/default_pic.png'}}"
+        style="width: 150rpx; height: 150rpx; margin: 20rpx" />
       <view style="width: 310rpx; display: flex; flex-direction: column; align-items: left">
-        <view style="font-size: 30rpx">电话：{{service.phonenum ? service.phone : "未公开"}}</view>
+        <view style="display: flex; flex-direction: row; ">
+          <view style="font-size: 40rpx; font-weight: bold">{{service.name}}</view>
+          <image @tap="call" style="width: 50rpx; height: 50rpx; margin: 10rpx" data-service="{{service}}" src="../resources/icons/phone.png" />
+        </view>
         <view style="font-size: 30rpx">地址：{{service.address}}</view>
       </view>
       <view style="width: 200rpx; display: flex; flex-direction:column; align-items: right; margin-left: 10rpx">
         <view style="font-size: 30rpx">{{service.distance}}千米</view>
-        <view style="font-size: 30rpx;">{{service.certification ? '工商户认证' : '未认证'}}</view>
-        <view @tap="follow" style="display: flex; align-items: center">
+        <!-- <view style="font-size: 30rpx;">{{service.certification ? '工商户认证' : '未认证'}}</view> -->
+        <view wx:if="{{follow}}" @tap="follow" style="display: flex; align-items: center">
           <view style="font-size: 30rpx;">关注</view>
           <image mode="aspectFit" style="width: 40rpx; height: 38rpx" src="{{service.follow ? '../resources/icons/follow-2.png' : '../resources/icons/follow-1.png'}}"></image>
         </view>
@@ -26,10 +30,16 @@
     </scroll-view>
     <view style="background-color: #ebebeb; display: flex; flex-direction: row; margin-top: 10rpx">
       <repeat for="{{imgArray}}">
-        <image src="{{item.picture}}" mode="scaleToFill" style="margin: 10rpx; width: 160rpx; height: 160rpx" />
+        <image @tap="preview" data-list="{{imgArray}}" data-src="{{item}}" src="{{item}}" mode="scaleToFill" style="margin: 10rpx; width: 160rpx; height: 160rpx" />
       </repeat>
     </view>
     <view style="width:100%; font-size: 30rpx; background-color: #ebebeb; margin-top: 25rpx">发布日期：{{service.datetime}}</view>
+    <view style="display: flex; flex-direction: row; margin-top: 20rpx; width: 100%">
+      <button style="border: solid; width: 50%; border-radius: 10rpx; border-color: #ebebeb" open-type="share" size="mini">分享本页
+                </button>
+      <button wx:if="{{report}}" style="border: solid; width: 50%; border-radius: 10rpx; border-color: #ebebeb" size="mini" @tap="report">举报
+                </button>
+    </view>
   </view>
 </template>
 
@@ -43,8 +53,7 @@
     config = {
       navigationBarTitleText: '服务详情'
     }
-    components = {
-    }
+    components = {}
     onShareAppMessage(res) {
       if (res.from === 'button') {
         // 来自页面内转发按钮
@@ -52,17 +61,37 @@
       }
       return {
         title: '服务标签',
-        path: '/pages/findMan?service=' +  JSON.stringify(this.service)
+        path: '/pages/findMan?service=' + JSON.stringify(this.service)
       }
     }
     data = {
       service: null,
       index: -1,
       imgArray: [],
+      report: false,
+      follow: true,
     }
-    computed = {
-    }
+    computed = {}
     methods = {
+      async call(e) {
+        let service = e.currentTarget.dataset.service;
+        if (service.phonenum) {
+          wx.makePhoneCall({
+            phoneNumber: service.phone
+          })
+        } else {
+          wx.showToast({
+            title: '该服务未公开手机',
+            icon: 'none'
+          })
+        }
+      },
+      report() {
+        wx.showToast({
+          title: '举报成功',
+          icon: 'none'
+        })
+      },
       follow() {
         if (this.$parent.globalData.user === null) {
           wx.showToast({
@@ -77,13 +106,23 @@
           this.$parent.follow(this.service);
         }
         this.service.follow = !this.service.follow;
+      },
+      preview(event) {
+        let src = event.currentTarget.dataset.src;
+        let imgList = event.currentTarget.dataset.list;
+        wx.previewImage({
+          current: src,
+          urls: imgList
+        })
       }
     }
-    events = {
-    }
+    events = {}
     async onLoad(param, data) {
       console.log(param)
       this.service = data.preload.service;
+      this.report = data.preload.report;
+      this.follow = data.preload.follow;
+      console.log(data.preload);
       try {
         let res = await wepy.request({
           url: httpHead + httpPort + "/service/getpicture",
@@ -91,10 +130,11 @@
             id: this.service.id
           }
         })
-        this.imgArray = res.data;
+        this.imgArray = res.data.map((item) => {
+          return item.picture;
+        });
         console.log(res)
-      } catch (e) {
-      }
+      } catch (e) {}
       this.$apply();
     }
   }

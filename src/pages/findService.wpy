@@ -57,7 +57,7 @@
   import labels from "../const/labels";
   export default class FindService extends wepy.page {
     config = {
-      navigationBarTitleText: '找服务'
+      navigationBarTitleText: '找人服务我'
     }
     components = {
       TopBar: TopBar
