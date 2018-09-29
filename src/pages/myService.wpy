@@ -6,9 +6,9 @@
   <view style="text-align: center">
     <view style="display: flex; flex-direction: row; ">
       <button style="border: solid; width: 375rpx; border-radius: 10rpx; border-color: aliceblue" open-type="getUserInfo" size="mini" @tap="bindPhone">绑定手机
-              </button>
+                </button>
       <button style="border: solid; width: 375rpx; border-radius: 10rpx; border-color: aliceblue" size="mini" @tap="newPublish">发布新广告
-              </button>
+                </button>
     </view>
     <view>
       我发布的服务
@@ -34,9 +34,9 @@
           </view>
           <view style="width: 100%; display: flex; flex-direction:row;">
             <view style="font-size:30rpx; margin: 10rpx; background-color: #000000; color: #ffffff; border-radius: 15rpx">已发布:{{item.days}}天</view>
-            <view style="width:200rpx" />
             <view style="font-size:30rpx; margin: 10rpx; background-color: #000000; color: #ffffff; border-radius: 15rpx" data-service="{{item}}" data-index="{{index}}" @tap="updateService">修改广告</view>
             <view style="font-size:30rpx; margin: 10rpx; background-color: #000000; color: #ffffff; border-radius: 15rpx" data-service="{{item}}" data-index="{{index}}" @tap="deleteService">删除广告</view>
+            <view style="font-size:30rpx; margin: 10rpx; background-color: #000000; color: #ffffff; border-radius: 15rpx" data-service="{{item}}" data-index="{{index}}" @tap="payPriority">付费优先展示</view>
           </view>
         </view>
       </view>
@@ -53,7 +53,9 @@
   import moment from 'moment'
   export default class MyService extends wepy.page {
     config = {
-      navigationBarTitleText: '我提供的服务'
+      navigationBarTitleText: '我提供的服务',
+      enablePullDownRefresh: true,
+      backgroundColor: "#90b3d0",
     }
     data = {
       services: [],
@@ -68,11 +70,11 @@
         let lot = location.longitude;
         dataset.service.distance = this.$parent.getFlatternDistance(dataset.service.latitude, dataset.service.longitude, lat, lot);
         dataset.service.pic = await wepy.request({
-            url: httpHead + httpPort + "/user/getphoto",
-            data: {
-              "phone": dataset.service.phone
-            }
-          })
+          url: httpHead + httpPort + "/user/getphoto",
+          data: {
+            "phone": dataset.service.phone
+          }
+        })
         this.$preload("service", dataset.service);
         this.$preload("report", false);
         this.$preload("follow", false);
@@ -148,23 +150,36 @@
             console.log(dataset);
           }
         } catch (e) {}
+      },
+      payPriority(e) {
+        let dataset = e.currentTarget.dataset;
+        this.$preload("service", dataset.service);
+        this.$navigate({
+          url: "./payPriority"
+        })
       }
     }
     onLoad() {
       if (this.$parent.globalData.user === null) {
         wepy.navigateTo({
-            url: "bindPhone"
-          })
+          url: "bindPhone"
+        })
       }
-    }
-    onShow() {
-      // this.uploadPhoto();
       if (!this.$parent.checkUserState(2)) {
         this.phone = null;
         return;
       }
       this.phone = this.$parent.globalData.user.phone;
       this.findUserService(this.$parent.globalData.user.id);
+    }
+    onPullDownRefresh() {
+      if (!this.$parent.checkUserState(2)) {
+        this.phone = null;
+        return;
+      }
+      this.phone = this.$parent.globalData.user.phone;
+      this.findUserService(this.$parent.globalData.user.id);
+      wx.stopPullDownRefresh()
     }
     async findUserService(id) {
       try {
@@ -174,7 +189,7 @@
             userId: id
           }
         })
-        console.log(res.data);
+        
         this.services = res.data.serviceinfoDTOList;
         for (let i = 0; i < this.services.length; i++) {
           let res = await wepy.request({
@@ -183,9 +198,10 @@
               id: this.services[i].id
             }
           })
-          this.services[i].imgArray = res.data;
-          this.services[i].days = - moment(this.services[i].datetime, "YYYYMMDD").diff(moment(), 'days')
+          this.services[i].imgArray = res.data.length > 0 ? res.data : [];
+          this.services[i].days = -moment(this.services[i].datetime, "YYYYMMDD").diff(moment(), 'days')
         }
+        console.log(this.services);
         this.$apply();
       } catch (e) {}
     }

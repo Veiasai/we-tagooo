@@ -20,6 +20,7 @@
         'pages/bindPhone',
         'pages/serviceInfo',
         'pages/newPublish',
+        'pages/payPriority',
       ],
       window: {
         backgroundTextStyle: 'light',

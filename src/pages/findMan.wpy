@@ -57,6 +57,9 @@
   var QQMapWX = require('../mixins/qqmap-wx-jssdk.min.js');
   export default class FindMan extends wepy.page {
     onLoad(param) {
+      this.qqmapsdk = new QQMapWX({
+        key: 'JKNBZ-CKHAU-L6JVQ-24SIQ-A2AM2-4YFCU'
+      });
       if (param.service !== undefined) {
         this.$preload("service", JSON.parse(param.service));
         this.$navigate({
@@ -66,6 +69,7 @@
       this.getLocation();
       this.search("");
     }
+   
     onShow() {
       if (this.$parent.globalData.service){
         this.services = this.$parent.globalData.service;
@@ -78,6 +82,7 @@
     data = {
       location: null,
       services: [],
+      qqmapsdk: null,
     }
     methods = {
       async call(e) {
@@ -176,16 +181,15 @@
       } catch (e) {}
     }
     async getLocation() {
-      let qqmapsdk = new QQMapWX({
-        key: 'JKNBZ-CKHAU-L6JVQ-24SIQ-A2AM2-4YFCU'
-      });
+      
       let res = await wepy.getLocation();
-      qqmapsdk.reverseGeocoder({
+      this.qqmapsdk.reverseGeocoder({
         location: {
           latitude: res.latitude,
           longitude: res.longitude
         },
         success: (addressRes) => {
+          console.log(addressRes);
           var address = addressRes.result.formatted_addresses.recommend;
           res.name = address;
           this.$parent.globalData.location = res;

@@ -118,11 +118,10 @@
     }
     events = {}
     async onLoad(param, data) {
-      console.log(param)
+      console.log("data", data.preload)
       this.service = data.preload.service;
       this.report = data.preload.report;
       this.follow = data.preload.follow;
-      console.log(data.preload);
       try {
         let res = await wepy.request({
           url: httpHead + httpPort + "/service/getpicture",

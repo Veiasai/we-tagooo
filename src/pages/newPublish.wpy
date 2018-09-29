@@ -39,15 +39,16 @@
         <view>在广告中公开手机号码:{{phone}} </view>
         <radio-group name="phonenum">
           <label>
-                    <radio value="1" checked="{{defaultPhone}}"/>
-                    是</label>
+                          <radio value="1" checked="{{defaultPhone}}"/>
+                          是</label>
           <label>
-                    <radio value="0" checked="{{!defaultPhone}}"/>
-                    否</label>
+                          <radio value="0" checked="{{!defaultPhone}}"/>
+                          否</label>
         </radio-group>
       </view>
       <view style="margin-top: 10rpx; display: flex; flex-direction: row; align-items: center">
-        <button size="mini" style="background-color: red; color: #ffffff" formType="submit">提交</button>
+        <button size="mini" style="background-color: red; color: #ffffff;" formType="submit">提交</button>
+        <button @tap="payPriority" size="mini" style="background-color: red; color: #ffffff; margin-left: 10rpx">付费优先展示</button>
       </view>
     </form>
     <modal hidden="{{!showThirdLabelModal}}" title="选择具体项" bindcancel="thirdLabelCancel" bindconfirm="thirdLabelConfirm">
@@ -74,44 +75,41 @@
     httpHead,
     httpPort
   } from "../const/properties";
-  export default class BindPhone extends wepy.page {
+  export default class newPublish extends wepy.page {
     async onLoad(param, data) {
       try {
         this.phone = this.$parent.globalData.user.phone;
         let service = data.preload.service;
-        if (service) {
-          this.id = service.id;
-          this.label = {
-            id: service.thirdLabelId,
-            name: service.basicLabelName + '-' + service.serviceLabelName + '-' + service.thirdLabelName
-          };
-          this.address = {
-            address: service.address,
-            name: "",
-            latitude: service.latitude,
-            longitude: service.longitude
-          };
-          this.defaultName = service.name + "(不能重设名字）";
-          this.defaultTitle = service.title;
-          this.defaultSlogan = service.slogan;
-          this.defaultPhone = service.phonenum;
-          this.imgArray = service.imgArray.map((item)=>{
-            return item.picture;
-          });
-          try {
-            let res = await wepy.request({
-              url: httpHead + httpPort + "/user/getphoto",
-              data: {
-                phone: this.phone
-              }
-            })
-            this.userImg = res.data;
-          } catch (e) {
+        this.id = service.id;
+        this.label = {
+          id: service.thirdLabelId,
+          name: service.basicLabelName + '-' + service.serviceLabelName + '-' + service.thirdLabelName
+        };
+        this.address = {
+          address: service.address,
+          name: "",
+          latitude: service.latitude,
+          longitude: service.longitude
+        };
+        this.defaultName = service.name;
+        this.defaultTitle = service.title;
+        this.defaultSlogan = service.slogan;
+        this.defaultPhone = service.phonenum;
+        this.imgArray = service.imgArray.map((item) => {
+          return item.picture;
+        });
+        let res = await wepy.request({
+          url: httpHead + httpPort + "/user/getphoto",
+          data: {
+            phone: this.phone
           }
-          this.$apply();
-        }
+        })
+        this.userImg = res.data;
+        this.$apply();
+        console.log(this.id);
       } catch (e) {
         this.id = null;
+        console.log(e);
       }
     }
     config = {
@@ -157,11 +155,6 @@
             title: '请选择服务类别',
             icon: 'none'
           })
-        } else if (this.userImg === null) {
-          wx.showToast({
-            title: '请上传头像',
-            icon: 'none'
-          })
         } else if (this.id !== null) {
           this.updatePublish(value);
         } else {
@@ -192,6 +185,21 @@
       },
       selectLabel() {
         this.showThirdLabelModal = true;
+      },
+      payPriority() {
+        if (this.label === null) {
+          wx.showToast({
+            title: '请选择服务类别',
+            icon: 'none'
+          })
+        } else {
+          let service = {};
+          service.basicLabelName = this.labels[this.s1].type;
+          this.$preload("service", service);
+          this.$navigate({
+            url: "payPriority"
+          })
+        }
       }
     }
     async addImg() {
@@ -262,7 +270,6 @@
           })
           userImg = res.data;
         }
-      
         let res = await wepy.request({
           url: httpHead + httpPort + "/service/newpublish",
           method: "POST",
@@ -283,33 +290,11 @@
         });
         console.log(res.data);
         if (res.data.publishStatus === 0) {
-          // if (this.userImgChange) {
-          //   let res = await wepy.uploadFile({
-          //     url: httpHead + httpPort + "/service/postFile",
-          //     filePath: this.userImg,
-          //     name: 'file',
-          //   })
-          //   let img = res.data;
-          //   res = await wepy.request({
-          //     url: httpHead + httpPort + "/user/uploadphoto",
-          //     method: "POST",
-          //     data: {
-          //       "phone": this.phone,
-          //       "photoImageValue": img,
-          //     }
-          //   })
-          // }
           wx.navigateBack();
           wx.showToast({
             title: '发布成功',
             icon: 'none'
           })
-          this.$preload("service", res.data);
-          this.$preload("report", false);
-          this.$preload("follow", false);
-          this.$navigate({
-          url: "./serviceInfo"
-        })
         } else {
           wx.showToast({
             title: '发布失败',
@@ -319,7 +304,7 @@
       } catch (e) {
         console.log(e);
       }
-      this.lock=0;
+      this.lock = 0;
       this.$apply();
     }
     async updatePublish(value) {
