@@ -69,8 +69,7 @@
       thirdLabelList: [],
       showThirdLabelModal: true,
     }
-    computed = {
-    }
+    computed = {}
     methods = {
       async location() {
         try {
@@ -137,11 +136,7 @@
         this.showThirdLabelModal = false;
       }
     }
-    events = {
-    }
-    onLoad() {
-    }
-    onShow(){
+    onShow() {
       this.location = this.$parent.globalData.location;
     }
   }

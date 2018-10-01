@@ -71,8 +71,9 @@
     }
    
     onShow() {
-      if (this.$parent.globalData.service){
+      if (this.$parent.globalData.service !== null){
         this.services = this.$parent.globalData.service;
+        this.$parent.globalData.service = null;
       }
       this.location = this.$parent.globalData.location;
     }
@@ -175,13 +176,11 @@
             }
           })
         }
-        this.$parent.globalData.service = this.services;
         console.log(this.services);
         this.$apply();
       } catch (e) {}
     }
     async getLocation() {
-      
       let res = await wepy.getLocation();
       this.qqmapsdk.reverseGeocoder({
         location: {

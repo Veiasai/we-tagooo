@@ -36,9 +36,9 @@
     <view style="width:100%; font-size: 30rpx; background-color: #ebebeb; margin-top: 25rpx">发布日期：{{service.datetime}}</view>
     <view style="display: flex; flex-direction: row; margin-top: 20rpx; width: 100%">
       <button style="border: solid; width: 50%; border-radius: 10rpx; border-color: #ebebeb" open-type="share" size="mini">分享本页
-                </button>
+                  </button>
       <button wx:if="{{report}}" style="border: solid; width: 50%; border-radius: 10rpx; border-color: #ebebeb" size="mini" @tap="report">举报
-                </button>
+                  </button>
     </view>
   </view>
 </template>
@@ -70,6 +70,8 @@
       imgArray: [],
       report: false,
       follow: true,
+      id: null,
+      back: 0,
     }
     computed = {}
     methods = {
@@ -116,12 +118,23 @@
         })
       }
     }
-    events = {}
+    onUnload(){
+      if (this.back === "1"){
+        wx.switchTab({
+          url:"./myService"
+        })
+      }
+    }
     async onLoad(param, data) {
       console.log("data", data.preload)
+      console.log("param", param);
+      this.back = param.back;
       this.service = data.preload.service;
       this.report = data.preload.report;
       this.follow = data.preload.follow;
+      if (param.id !== undefined) {
+        this.service = await this.findById(param.id)
+      }
       try {
         let res = await wepy.request({
           url: httpHead + httpPort + "/service/getpicture",
@@ -135,6 +148,18 @@
         console.log(res)
       } catch (e) {}
       this.$apply();
+    }
+    async findById(id) {
+      try {
+        let res = await wepy.request({
+          url: httpHead + httpPort + "/user/findbyid",
+          data: {
+            id: id
+          }
+        })
+        return res.data;
+      } catch (e) {
+      }
     }
   }
 </script>

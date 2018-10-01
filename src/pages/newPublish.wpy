@@ -39,11 +39,11 @@
         <view>在广告中公开手机号码:{{phone}} </view>
         <radio-group name="phonenum">
           <label>
-                          <radio value="1" checked="{{defaultPhone}}"/>
-                          是</label>
+                              <radio value="1" checked="{{defaultPhone}}"/>
+                              是</label>
           <label>
-                          <radio value="0" checked="{{!defaultPhone}}"/>
-                          否</label>
+                              <radio value="0" checked="{{!defaultPhone}}"/>
+                              否</label>
         </radio-group>
       </view>
       <view style="margin-top: 10rpx; display: flex; flex-direction: row; align-items: center">
@@ -290,10 +290,15 @@
         });
         console.log(res.data);
         if (res.data.publishStatus === 0) {
-          wx.navigateBack();
           wx.showToast({
             title: '发布成功',
             icon: 'none'
+          })
+          this.$preload("service", res.data);
+          this.$preload("report", false);
+          this.$preload("follow", false);
+          this.$navigate({
+            url: "./serviceInfo?back=1"
           })
         } else {
           wx.showToast({
@@ -323,10 +328,14 @@
         });
         console.log(res.data);
         if (res.data.status === 0) {
-          wx.navigateBack();
           wx.showToast({
             title: '更新成功',
             icon: 'none'
+          })
+          this.$preload("report", false);
+          this.$preload("follow", false);
+          this.$navigate({
+            url: "./serviceInfo?back=1&id=" + this.id
           })
         } else {
           wx.showToast({
