@@ -109,11 +109,12 @@
           });
           for (let i = 0; i < services.length; i++) {
             services[i].pic = await wepy.request({
-              url: httpHead + httpPort + "/user/getphoto",
+              url: httpHead + httpPort + "/user/getphotoUrl",
               data: {
                 "phone": services[i].phone
               }
-            })
+            }) 
+            services[i].pic.data += "display"
           }
           this.$parent.globalData.service = services;
           this.$apply();

@@ -117,11 +117,12 @@
         });
         for (let i = 0; i < this.followServices.length; i++) {
           this.followServices[i].pic = await wepy.request({
-            url: httpHead + httpPort + "/user/getphoto",
+            url: httpHead + httpPort + "/user/getphotoUrl",
             data: {
               "phone": this.followServices[i].phone
             }
           })
+          this.followServices[i].pic.data += "display"
         }
         this.$apply();
       } catch (e) {

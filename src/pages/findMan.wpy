@@ -24,10 +24,10 @@
       <repeat for="{{services}}">
         <view style="display: flex; flex-direction: row; background-color: #ebebeb; margin-top: 20rpx; margin-left:25rpx; width: 750rpx; height: 190rpx">
           <image src="{{item.pic ? item.pic.data : '../resources/icons/default_pic.png'}}" style="width: 150rpx; height: 150rpx; margin: 20rpx" />
-          <view  style="width: 310rpx; align-items: left; margin: 10rpx">
+          <view style="width: 310rpx; align-items: left; margin: 10rpx">
             <view style="display: flex; flex-direction: row;">
               <view style="font-size: 40rpx; font-weight: bold">{{item.name}}</view>
-              <image @tap="call" style="width: 50rpx; height: 50rpx; margin: 10rpx"  data-service="{{item}}" src="../resources/icons/phone.png"/>
+              <image @tap="call" style="width: 50rpx; height: 50rpx; margin: 10rpx" data-service="{{item}}" src="../resources/icons/phone.png" />
             </view>
             <view @tap="serviceInfo" data-service="{{item}}" data-index="{{index}}" style="font-size: 35rpx;">{{item.title}}</view>
           </view>
@@ -61,17 +61,18 @@
         key: 'JKNBZ-CKHAU-L6JVQ-24SIQ-A2AM2-4YFCU'
       });
       if (param.service !== undefined) {
-        this.$preload("service", JSON.parse(param.service));
+        this.$preload("service", null);
+        this.$preload("report", true);
+        this.$preload("follow", true);
         this.$navigate({
-          url: "./serviceInfo"
+          url: "./serviceInfo?id=" + param.service
         })
       }
       this.getLocation();
       this.search("");
     }
-   
     onShow() {
-      if (this.$parent.globalData.service !== null){
+      if (this.$parent.globalData.service !== null) {
         this.services = this.$parent.globalData.service;
         this.$parent.globalData.service = null;
       }
@@ -88,11 +89,11 @@
     methods = {
       async call(e) {
         let service = e.currentTarget.dataset.service;
-        if (service.phonenum){
+        if (service.phonenum) {
           wx.makePhoneCall({
             phoneNumber: service.phone
           })
-        }else{
+        } else {
           wx.showToast({
             title: '该服务未公开手机',
             icon: 'none'
@@ -170,11 +171,12 @@
         });
         for (let i = 0; i < this.services.length; i++) {
           this.services[i].pic = await wepy.request({
-            url: httpHead + httpPort + "/user/getphoto",
+            url: httpHead + httpPort + "/user/getphotoUrl",
             data: {
               "phone": this.services[i].phone
             }
           })
+          this.services[i].pic.data += "display"
         }
         console.log(this.services);
         this.$apply();

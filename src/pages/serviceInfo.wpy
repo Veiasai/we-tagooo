@@ -36,9 +36,9 @@
     <view style="width:100%; font-size: 30rpx; background-color: #ebebeb; margin-top: 25rpx">发布日期：{{service.datetime}}</view>
     <view style="display: flex; flex-direction: row; margin-top: 20rpx; width: 100%">
       <button style="border: solid; width: 50%; border-radius: 10rpx; border-color: #ebebeb" open-type="share" size="mini">分享本页
-                  </button>
+                    </button>
       <button wx:if="{{report}}" style="border: solid; width: 50%; border-radius: 10rpx; border-color: #ebebeb" size="mini" @tap="report">举报
-                  </button>
+                    </button>
     </view>
   </view>
 </template>
@@ -61,7 +61,7 @@
       }
       return {
         title: '服务标签',
-        path: '/pages/findMan?service=' + JSON.stringify(this.service)
+        path: '/pages/findMan?service=' + this.service.id
       }
     }
     data = {
@@ -118,10 +118,10 @@
         })
       }
     }
-    onUnload(){
-      if (this.back === "1"){
+    onUnload() {
+      if (this.back === "1") {
         wx.switchTab({
-          url:"./myService"
+          url: "./myService"
         })
       }
     }
@@ -137,13 +137,13 @@
       }
       try {
         let res = await wepy.request({
-          url: httpHead + httpPort + "/service/getpicture",
+          url: httpHead + httpPort + "/service/getpictureUrl",
           data: {
             id: this.service.id
           }
         })
         this.imgArray = res.data.map((item) => {
-          return item.picture;
+          return item.picture + "display";
         });
         console.log(res)
       } catch (e) {}
@@ -152,14 +152,32 @@
     async findById(id) {
       try {
         let res = await wepy.request({
-          url: httpHead + httpPort + "/user/findbyid",
+          url: httpHead + httpPort + "/service/findbyid",
           data: {
             id: id
           }
         })
-        return res.data;
-      } catch (e) {
-      }
+        let service = res.data;
+        if (service === null){
+          wx.showToast({
+            title: '找不到该页面，可能已被删除',
+            icon: 'none'
+          })
+          return;
+        }
+        let location = await wepy.getLocation();
+        let lat = location.latitude;
+        let lot = location.longitude;
+        service.distance = this.$parent.getFlatternDistance(service.latitude, service.longitude, lat, lot);
+        service.pic = await wepy.request({
+          url: httpHead + httpPort + "/user/getphotoUrl",
+          data: {
+            "phone": service.phone
+          } 
+        })
+        service.pic.data += "display"
+        return service;
+      } catch (e) {}
     }
   }
 </script>

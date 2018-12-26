@@ -39,11 +39,11 @@
         <view>在广告中公开手机号码:{{phone}} </view>
         <radio-group name="phonenum">
           <label>
-                              <radio value="1" checked="{{defaultPhone}}"/>
-                              是</label>
+                                    <radio value="1" checked="{{defaultPhone}}"/>
+                                    是</label>
           <label>
-                              <radio value="0" checked="{{!defaultPhone}}"/>
-                              否</label>
+                                    <radio value="0" checked="{{!defaultPhone}}"/>
+                                    否</label>
         </radio-group>
       </view>
       <view style="margin-top: 10rpx; display: flex; flex-direction: row; align-items: center">
@@ -99,11 +99,12 @@
           return item.picture;
         });
         let res = await wepy.request({
-          url: httpHead + httpPort + "/user/getphoto",
+          url: httpHead + httpPort + "/user/getphotoUrl",
           data: {
             phone: this.phone
           }
         })
+        res.data += "display"
         this.userImg = res.data;
         this.$apply();
         console.log(this.id);
@@ -203,6 +204,13 @@
       }
     }
     async addImg() {
+      if (this.id !== null) {
+        wx.showToast({
+          title: '不能更新图片',
+          icon: 'none'
+        })
+        return;
+      }
       try {
         let res = await wepy.chooseImage({
           count: 4 - this.imgArray.length, // 默认9
@@ -216,6 +224,13 @@
       }
     }
     async addUserImg() {
+      if (this.id !== null) {
+        wx.showToast({
+          title: '不能更新图片',
+          icon: 'none'
+        })
+        return;
+      }
       try {
         let res = await wepy.chooseImage({
           count: 1, // 默认9
@@ -294,12 +309,7 @@
             title: '发布成功',
             icon: 'none'
           })
-          this.$preload("service", res.data);
-          this.$preload("report", false);
-          this.$preload("follow", false);
-          this.$navigate({
-            url: "./serviceInfo?back=1"
-          })
+          this.checkService(res.data);
         } else {
           wx.showToast({
             title: '发布失败',
@@ -313,6 +323,9 @@
       this.$apply();
     }
     async updatePublish(value) {
+      if (this.lock === 1)
+        return;
+      this.lock = 1;
       try {
         let res = await wepy.request({
           url: httpHead + httpPort + "/service/modify",
@@ -327,16 +340,12 @@
           }
         });
         console.log(res.data);
-        if (res.data.status === 0) {
+        if (res.data.modifyStatus === 0) {
           wx.showToast({
             title: '更新成功',
             icon: 'none'
           })
-          this.$preload("report", false);
-          this.$preload("follow", false);
-          this.$navigate({
-            url: "./serviceInfo?back=1&id=" + this.id
-          })
+          this.checkService(res.data);
         } else {
           wx.showToast({
             title: '更新失败',
@@ -347,6 +356,26 @@
       } catch (e) {
         console.log(e);
       }
+      this.lock = 0;
+      this.$apply();
+    }
+    async checkService(service) {
+      let location = await wepy.getLocation();
+      let lat = location.latitude;
+      let lot = location.longitude;
+      service.distance = this.$parent.getFlatternDistance(service.latitude, service.longitude, lat, lot);
+      service.pic = await wepy.request({
+        url: httpHead + httpPort + "/user/getphoto",
+        data: {
+          "phone": service.phone
+        }
+      })
+      this.$preload("service", service);
+      this.$preload("report", false);
+      this.$preload("follow", false);
+      this.$navigate({
+        url: "./serviceInfo?back=1"
+      })
     }
   }
 </script>

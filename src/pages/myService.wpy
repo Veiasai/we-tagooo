@@ -5,10 +5,10 @@
 <template>
   <view style="text-align: center">
     <view style="display: flex; flex-direction: row; ">
-      <button style="border: solid; width: 375rpx; border-radius: 10rpx; border-color: aliceblue" open-type="getUserInfo" size="mini" @tap="bindPhone">绑定手机
-                </button>
-      <button style="border: solid; width: 375rpx; border-radius: 10rpx; border-color: aliceblue" size="mini" @tap="newPublish">发布新广告
-                </button>
+      <button wx:if="{{!phone}}" style="border: solid; width: 100%; border-radius: 10rpx; border-color: aliceblue" open-type="getUserInfo" size="mini" @tap="bindPhone">绑定手机
+                  </button>
+      <button style="border: solid; width: 100%; border-radius: 10rpx; border-color: aliceblue" size="mini" @tap="newPublish">发布新广告
+                  </button>
     </view>
     <view>
       我发布的服务
@@ -29,7 +29,7 @@
         <view style="width: 650rpx; display:flex; flex-direction:column;">
           <view style="background-color: #ebebeb; display: flex; flex-direction: row; margin-top: 10rpx">
             <repeat for="{{item.imgArray}}" item="iitem">
-              <image src="{{iitem.picture}}" mode="scaleToFill" style="margin: 10rpx; width: 160rpx; height: 160rpx" />
+              <image src="{{iitem}}" mode="scaleToFill" style="margin: 10rpx; width: 160rpx; height: 160rpx" />
             </repeat>
           </view>
           <view style="width: 100%; display: flex; flex-direction:row;">
@@ -70,11 +70,12 @@
         let lot = location.longitude;
         dataset.service.distance = this.$parent.getFlatternDistance(dataset.service.latitude, dataset.service.longitude, lat, lot);
         dataset.service.pic = await wepy.request({
-          url: httpHead + httpPort + "/user/getphoto",
+          url: httpHead + httpPort + "/user/getphotoUrl",
           data: {
             "phone": dataset.service.phone
           }
         })
+        dataset.service.pic.data += "display"
         this.$preload("service", dataset.service);
         this.$preload("report", false);
         this.$preload("follow", false);
@@ -189,16 +190,21 @@
             userId: id
           }
         })
-        
         this.services = res.data.serviceinfoDTOList;
         for (let i = 0; i < this.services.length; i++) {
           let res = await wepy.request({
-            url: httpHead + httpPort + "/service/getpicture",
+            url: httpHead + httpPort + "/service/getpictureUrl",
             data: {
               id: this.services[i].id
             }
           })
-          this.services[i].imgArray = res.data.length > 0 ? res.data : [];
+          if (res.data.length > 0) {
+            this.services[i].imgArray = res.data.map((item) => {
+              return item.picture + "display";
+            });
+          } else {
+            this.services[i].imgArray = [];
+          }
           this.services[i].days = -moment(this.services[i].datetime, "YYYYMMDD").diff(moment(), 'days')
         }
         console.log(this.services);
