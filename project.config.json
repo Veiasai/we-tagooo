@@ -10,6 +10,6 @@
 	"compileType": "miniprogram",
 	"appid": "wxdff208a74e2f7ea1",
 	"projectname": "tagoo",
-	"miniprogramRoot": "./dist",
+	"miniprogramRoot": "dist/",
 	"condition": {}
 }

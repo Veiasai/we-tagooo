@@ -68,15 +68,30 @@
                 console.log('radio发生change事件，携带value值为：', e.detail.value)
                 this.select = e.detail.value;
             },
-            pay() {
+            async pay() {
+                console.log(this.select);
+                let res = await wepy.request({
+                    url: httpHead + httpPort + "/order/wx/jsapipay",
+                    method: "POST",
+                    data: {
+                        "ip": "0", // blank
+                        "level": 1,
+                        "serviceId": this.service.id
+                    }
+                })
+                console.log(res);
                 wx.requestPayment({
-                    'timeStamp': '',
-                    'nonceStr': '',
-                    'package': '',
+                    'timeStamp': res.data.timestamp,
+                    'nonceStr': res.data.noncestr,
+                    'package': "prepay_id=" + res.data.prepayid,
                     'signType': 'MD5',
-                    'paySign': '',
-                    'success': function(res) {},
-                    'fail': function(res) {}
+                    'paySign': res.data.sign,
+                    'success': (res)=> {
+                        console.log(res);
+                    },
+                    'fail': (res)=> {
+                        console.log(res);
+                    }
                 })
             }
         }
