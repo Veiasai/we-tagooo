@@ -20,7 +20,10 @@
                 </view>
             </repeat>
         </radio-group>
-        <button @tap="pay">
+        <button wx:if="{{service.id === undefined}}" @tap="confirm" >
+                确认选择
+                </button>
+        <button wx:if="{{service.id}}" @tap="pay">
                 微信支付
             </button>
     </view>
@@ -68,6 +71,10 @@
                 console.log('radio发生change事件，携带value值为：', e.detail.value)
                 this.select = e.detail.value;
             },
+            confirm(){
+                this.$parent.globalData.prepay_level = this.select;
+                wx.navigateBack();
+            },
             async pay() {
                 console.log(this.select);
                 let res = await wepy.request({
@@ -75,8 +82,9 @@
                     method: "POST",
                     data: {
                         "ip": "0", // blank
-                        "level": 1,
-                        "serviceId": this.service.id
+                        "level": this.select,
+                        "serviceId": this.service.id,
+                        "openId": this.$parent.globalData.user.id
                     }
                 })
                 console.log(res);

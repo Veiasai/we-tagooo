@@ -69,6 +69,7 @@
       userState: 1,
       userInfo: null,
       followServices: [],
+      prepay_level: -1,
     }
     constructor() {
       super();

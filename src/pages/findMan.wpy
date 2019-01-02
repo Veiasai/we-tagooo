@@ -166,9 +166,7 @@
         this.services = res.data.map((item, index) => {
           item.distance = this.$parent.getFlatternDistance(item.latitude, item.longitude, lat, lot);
           return item;
-        }).sort((a, b) => {
-          return a.distance < b.distance;
-        });
+        })  // .sort((a, b) => {return a.distance < b.distance;});
         for (let i = 0; i < this.services.length; i++) {
           this.services[i].pic = await wepy.request({
             url: httpHead + httpPort + "/user/getphotoUrl",

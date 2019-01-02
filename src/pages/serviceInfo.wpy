@@ -146,7 +146,38 @@
           return item.picture + "display";
         });
         console.log(res)
-      } catch (e) {}
+      } catch (e) {
+        
+      }
+
+      if (this.$parent.globaData.prepay_level >= 0){
+        let res = await wepy.request({
+                    url: httpHead + httpPort + "/order/wx/jsapipay",
+                    method: "POST",
+                    data: {
+                        "ip": "0", // blank
+                        "level": this.$parent.globaData.prepay_level,
+                        "serviceId": this.service.id,
+                        "openId": this.$parent.globalData.user.id
+                    }
+                })
+                console.log(res);
+        this.$parent.globaData.prepay_level = 0;
+        wx.requestPayment({
+            'timeStamp': res.data.timestamp,
+            'nonceStr': res.data.noncestr,
+            'package': "prepay_id=" + res.data.prepayid,
+            'signType': 'MD5',
+            'paySign': res.data.sign,
+            'success': (res)=> {
+                console.log(res);
+            },
+            'fail': (res)=> {
+                console.log(res);
+            }
+        })
+      }
+
       this.$apply();
     }
     async findById(id) {

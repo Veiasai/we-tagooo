@@ -78,6 +78,7 @@
   export default class newPublish extends wepy.page {
     async onLoad(param, data) {
       try {
+        this.$parent.globaData.prepay_level = -1;
         this.phone = this.$parent.globalData.user.phone;
         let service = data.preload.service;
         this.id = service.id;
