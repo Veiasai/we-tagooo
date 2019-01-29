@@ -60,7 +60,7 @@
         console.log(res.target)
       }
       return {
-        title: '服务标签',
+        title: '',
         path: '/pages/findMan?service=' + this.service.id
       }
     }

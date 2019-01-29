@@ -21,6 +21,7 @@
         'pages/serviceInfo',
         'pages/newPublish',
         'pages/payPriority',
+        'pages/userAgreement',
       ],
       window: {
         backgroundTextStyle: 'light',
@@ -67,7 +68,7 @@
       // {id: "4028815e5dd036b7015dd037e3930000"},
       // 1 未绑定手机号， 2 成功获取UserId
       userState: 1,
-      userInfo: null,
+      userInfo: null, // wechat info
       followServices: [],
       prepay_level: -1,
     }

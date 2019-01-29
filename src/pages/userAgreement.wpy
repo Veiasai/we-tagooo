@@ -1,0 +1,28 @@
+<style lang="less">
+
+</style>
+
+<template>
+    <web-view src="{{agreement}}" />
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import {
+    httpHead,
+    httpPort
+  } from "../const/properties";
+  import moment from 'moment'
+  export default class MyService extends wepy.page {
+    config = {
+      navigationBarTitleText: '用户协议',
+      backgroundColor: "#90b3d0",
+    }
+    data = {
+      agreement: httpHead + httpPort + "/user/getUserAgreement"
+    }
+    methods = {
+
+    }
+  }
+</script>

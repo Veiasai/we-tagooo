@@ -16,11 +16,12 @@
           <button size="mini" style="background-color: red; color: #ffffff" @tap="getValidateCode">获取验证码</button>
         </view>
       </view>
-      <view style="margin: 15rpx; font-size: 27rpx">
+      <view style="margin: 15rpx; font-size: 27rpx;">
         <checkbox-group name="auth">
           <checkbox value="{{auth.value}}" checked="{{auth.checked}}" />我同意
-          <a>"用户服务条款"</a>
+          <a @tap="userAgreement" style="color: blue; text-decoration: underline">"用户服务条款"</a>
         </checkbox-group>
+        
       </view>
       <button style="margin-top: 50rpx; background-color: red; width: 650rpx; color: #ffffff" formType="submit">提交</button>
     </form>
@@ -44,11 +45,17 @@
       auth: {
         value: 1,
         checked: false
-      }
+      },
+      userAgreement: httpHead + httpPort + "user/getUserAgreement",
     }
     computed = {
     }
     methods = {
+      userAgreement(){
+        this.$navigate({
+          url: "./userAgreement"
+        })
+      },
       formSubmit(e) {
         console.log('form发生了submit事件，携带数据为：', e.detail.value)
         let value = e.detail.value;

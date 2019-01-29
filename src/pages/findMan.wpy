@@ -35,7 +35,7 @@
             <view style="margin-top:10rpx; font-size: 27rpx">{{item.distance}}千米</view>
             <view style="display: flex; flex-direction: row;">
               <!-- <view style="margin-top:10rpx; font-size: 27rpx;">{{item.certification ? '工商户认证' : '未认证'}}</view> -->
-              <image mode="aspectFit" style="width: 40rpx; height: 38rpx" src='../resources/icons/auth.png' />
+              <!-- <image mode="aspectFit" style="width: 40rpx; height: 38rpx" src='../resources/icons/auth.png' /> -->
             </view>
             <view @tap="follow" data-service="{{item}}" data-index="{{index}}" style="margin-top:10rpx; display: flex; align-items: center">
               <view style="font-size: 27rpx;">关注</view>
