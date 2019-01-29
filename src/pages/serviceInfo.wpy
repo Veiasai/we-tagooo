@@ -150,19 +150,20 @@
         
       }
 
-      if (this.$parent.globaData.prepay_level >= 0){
+      // prepay
+      if (this.$parent.globalData.prepay_level >= 0){
         let res = await wepy.request({
                     url: httpHead + httpPort + "/order/wx/jsapipay",
                     method: "POST",
                     data: {
                         "ip": "0", // blank
-                        "level": this.$parent.globaData.prepay_level,
+                        "level": this.$parent.globalData.prepay_level,
                         "serviceId": this.service.id,
                         "openId": this.$parent.globalData.user.id
                     }
                 })
                 console.log(res);
-        this.$parent.globaData.prepay_level = 0;
+        this.$parent.globalData.prepay_level = -1;
         wx.requestPayment({
             'timeStamp': res.data.timestamp,
             'nonceStr': res.data.noncestr,
