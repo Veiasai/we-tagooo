@@ -19,7 +19,7 @@
       <view style="margin: 15rpx; font-size: 27rpx;">
         <checkbox-group name="auth">
           <checkbox value="{{auth.value}}" checked="{{auth.checked}}" />我同意
-          <a @tap="userAgreement" style="color: blue; text-decoration: underline">"用户服务条款"</a>
+          <a @tap="userAgreement" style="color: blue; text-decoration: underline">"用户使用协议"</a>
         </checkbox-group>
         
       </view>
@@ -36,7 +36,7 @@
   } from "../const/properties";
   export default class BindPhone extends wepy.page {
     config = {
-      navigationBarTitleText: '绑定手机'
+      navigationBarTitleText: '请登录'
     }
     components = {
     }
@@ -71,7 +71,7 @@
           })
         } else if (value.auth.length === 0) {
           wx.showToast({
-            title: '请确认服务条款',
+            title: '请确认用户使用协议',
             icon: 'none'
           })
         } else {

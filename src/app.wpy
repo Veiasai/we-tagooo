@@ -71,6 +71,8 @@
       userInfo: null, // wechat info
       followServices: [],
       prepay_level: -1,
+      followRefresh: false,
+      followServices: null,
     }
     constructor() {
       super();
@@ -138,6 +140,7 @@
           }
         })
         console.log(res);
+        this.globalData.followRefresh = true;
       } catch (e) {
         console.log(e);
       }
@@ -156,6 +159,7 @@
             "userId": this.globalData.user.id,
           }
         })
+        this.globalData.followRefresh = true;
         console.log(res);
       } catch (e) {
         console.log(e);

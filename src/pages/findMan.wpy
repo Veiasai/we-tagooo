@@ -74,9 +74,9 @@
     onShow() {
       if (this.$parent.globalData.service !== null) {
         this.services = this.$parent.globalData.service;
-        this.$parent.globalData.service = null;
       }
       this.location = this.$parent.globalData.location;
+      this.$apply();
     }
     config = {
       navigationBarTitleText: '找到的人'
@@ -177,6 +177,7 @@
           this.services[i].pic.data += "display"
         }
         console.log(this.services);
+        this.$parent.globalData.service = this.services
         this.$apply();
       } catch (e) {}
     }

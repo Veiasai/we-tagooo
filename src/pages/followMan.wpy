@@ -68,17 +68,32 @@
         let dataset = e.currentTarget.dataset;
         this.$parent.followRemove(dataset.service);
         this.followServices.splice(dataset.index, 1);
+        let services = this.$parent.globalData.service;
+        for (let i=0;i<services.length;i++){
+          if (services[i].id === dataset.service.id){
+            services[i].follow = false;
+            break;
+          }
+        }
       }
     }
     events = {
     }
     onLoad() {
+      this.$parent.globalData.followServices = this.followServices;
       if (this.$parent.globalData.user === null) {
         wepy.navigateTo({
             url: "bindPhone"
           })
       }else{
         this.findFollow(this.$parent.globalData.user.id);
+      }
+    }
+
+    onShow() {
+      if (this.$parent.globalData.followRefresh){
+        this.findFollow(this.$parent.globalData.user.id);
+        this.$parent.globalData.followRefresh = false;
       }
     }
 
@@ -123,6 +138,13 @@
             }
           })
           this.followServices[i].pic.data += "display"
+          let services = this.$parent.globalData.service;
+          for (let j=0;j<services.length;j++){
+          if (services[j].id === this.followServices[i].id){
+            services[j].follow = true;
+            break;
+          }
+        }
         }
         this.$apply();
       } catch (e) {
