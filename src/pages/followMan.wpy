@@ -139,6 +139,7 @@
           })
           this.followServices[i].pic.data += "display"
           let services = this.$parent.globalData.service;
+          this.$parent.globalData.followService = this.followServices;
           for (let j=0;j<services.length;j++){
           if (services[j].id === this.followServices[i].id){
             services[j].follow = true;

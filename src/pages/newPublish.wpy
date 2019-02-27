@@ -55,7 +55,7 @@
         <button @tap="payPriority" size="mini" style="background-color: red; color: #ffffff; margin-left: 10rpx">付费优先展示</button>
       </view>
     </form>
-    <modal hidden="{{!showThirdLabelModal}}" title="选择分类（一级>二级>三级" bindcancel="thirdLabelCancel" bindconfirm="thirdLabelConfirm">
+    <modal hidden="{{!showThirdLabelModal}}" title="选择分类(一级>二级>三级)" bindcancel="thirdLabelCancel" bindconfirm="thirdLabelConfirm">
       <view style="width: 100%; display: flex; flex-direction: row;">
         <view style="width: 30%">
           <view style="margin: 15rpx; font-size: 28rpx" data-s1="{{index}}" class="{{s1===index?'cur':''}}" wx:for="{{labels}}"  @tap="bindChange">{{item.type}}</view>

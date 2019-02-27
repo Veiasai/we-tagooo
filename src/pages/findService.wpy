@@ -117,6 +117,15 @@
             services[i].pic.data += "display"
           }
           this.$parent.globalData.service = services;
+          let followServices = this.$parent.globalData.followService;
+          for (let i = 0; i < followServices.length; i++) {
+            for (let j=0;j<services.length;j++){
+              if (services[j].id === followServices[i].id){
+                services[j].follow = true;
+                break;
+              }
+            }
+          }
           this.$apply();
           wx.switchTab({
             url: "./findMan"

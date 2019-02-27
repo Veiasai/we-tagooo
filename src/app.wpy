@@ -74,10 +74,9 @@
       // 1 未绑定手机号， 2 成功获取UserId
       userState: 1,
       userInfo: null, // wechat info
-      followServices: [],
+      followService: [],
       prepay_level: -1,
       followRefresh: false,
-      followServices: null,
     }
     constructor() {
       super();

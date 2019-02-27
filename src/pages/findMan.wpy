@@ -178,8 +178,19 @@
         }
         console.log(this.services);
         this.$parent.globalData.service = this.services
+        let followServices = this.$parent.globalData.followService;
+        for (let i = 0; i < followServices.length; i++) {
+          for (let j=0;j<this.services.length;j++){
+            if (this.services[j].id === followServices[i].id){
+              this.services[j].follow = true;
+              break;
+            }
+          }
+        }
         this.$apply();
-      } catch (e) {}
+      } catch (e) {
+        console.log(e)
+      }
     }
     async getLocation() {
       let res = await wepy.getLocation();
