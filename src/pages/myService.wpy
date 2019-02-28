@@ -45,7 +45,7 @@
             <view style="font-size:30rpx; margin: 10rpx; background-color: #000000; color: #ffffff; border-radius: 15rpx">已发布:{{item.days}}天</view>
             <view style="font-size:30rpx; margin: 10rpx; background-color: #000000; color: #ffffff; border-radius: 15rpx" data-service="{{item}}" data-index="{{index}}" @tap="updateService">修改广告</view>
             <view style="font-size:30rpx; margin: 10rpx; background-color: #000000; color: #ffffff; border-radius: 15rpx" data-service="{{item}}" data-index="{{index}}" @tap="deleteService">删除广告</view>
-            <view style="font-size:30rpx; margin: 10rpx; background-color: #000000; color: #ffffff; border-radius: 15rpx" data-service="{{item}}" data-index="{{index}}" @tap="payPriority">付费优先展示</view>
+            <view style="font-size:30rpx; margin: 10rpx; background-color: #000000; color: #ffffff; border-radius: 15rpx" data-service="{{item}}" data-index="{{index}}" @tap="payPriority">{{item.leftTime ? "剩余时间:"+item.leftTime: "付费优先展示"}}</view>
           </view>
         </view>
       </view>

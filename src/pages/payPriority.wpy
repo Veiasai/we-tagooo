@@ -84,7 +84,7 @@
                         "ip": "0", // blank
                         "level": this.select,
                         "serviceId": this.service.id,
-                        "openId": this.$parent.globalData.user.id
+                        "openId": this.$parent.globalData.user.wcid === "" ? this.$parent.globalData.user.id : this.$parent.globalData.user.wcid
                     }
                 })
                 console.log(res);
