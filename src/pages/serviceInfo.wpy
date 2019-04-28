@@ -89,9 +89,19 @@
         }
       },
       report() {
-        wx.showToast({
-          title: '举报成功',
-          icon: 'none'
+        wx.showModal({
+          title: '提示',
+          content: '确认举报本页吗？',
+          success(res) {
+            if (res.confirm) {
+                wx.showToast({
+                  title: '举报成功',
+                  icon: 'none'
+                })
+            } else if (res.cancel) {
+              console.log('用户点击取消')
+            }
+          }
         })
       },
       follow() {

@@ -23,29 +23,31 @@
       我发布的服务
     </view>
     <repeat for="{{services}}">
-      <view style="font-size:30rpx; text-align: left; margin-left: 15rpx">{{item.basicLabelName + '>' + item.serviceLabelName + '>' + item.thirdLabelName}}</view>
-      <view @tap="serviceInfo" data-service="{{item}}" style="display: flex; flex-direction: row; background-color: #ebebeb; width: 750rpx;">
-        <view style="width: 650rpx; display:flex; flex-direction:column; align-items: left" data-service="{{item}}" data-index="{{index}}">
-          <scroll-view scroll-y style="height: 20vh; background-color: #ebebeb; margin-top: 25rpx">
-            <view style="text-align: left">
-              <view style="font-size: 35rpx; font-weight: bold; margin-left: 15rpx;">{{item.title}}</view>
-              <view style="font-size: 30rpx; margin-left: 15rpx;">{{item.slogan}}</view>
-            </view>
-          </scroll-view>
-        </view>
-      </view>
-      <view style="display: flex; flex-direction: row; background-color: #ebebeb; width: 750rpx; margin-top: 10rpx">
-        <view style="width: 650rpx; display:flex; flex-direction:column;">
-          <view style="background-color: #ebebeb; display: flex; flex-direction: row; margin-top: 10rpx">
-            <repeat for="{{item.imgArray}}" item="iitem">
-              <image src="{{iitem}}" mode="scaleToFill" style="margin: 10rpx; width: 160rpx; height: 160rpx" />
-            </repeat>
+      <view style="border: solid; width: 95%; border-radius: 10rpx; border-width: 5rpx; border-color: red; margin: 10rpx">
+        <view style="font-size:30rpx; text-align: left; margin-left: 15rpx">{{item.basicLabelName + '>' + item.serviceLabelName + '>' + item.thirdLabelName}}</view>
+        <view @tap="serviceInfo" data-service="{{item}}" style="display: flex; flex-direction: row; background-color: #ebebeb;">
+          <view style="width: 650rpx; display:flex; flex-direction:column; align-items: left" data-service="{{item}}" data-index="{{index}}">
+            <scroll-view scroll-y style="height: 20vh; background-color: #ebebeb; margin-top: 25rpx">
+              <view style="text-align: left">
+                <view style="font-size: 35rpx; font-weight: bold; margin-left: 15rpx;">{{item.title}}</view>
+                <view style="font-size: 30rpx; margin-left: 15rpx;">{{item.slogan}}</view>
+              </view>
+            </scroll-view>
           </view>
-          <view style="width: 100%; display: flex; flex-direction:row;">
-            <view style="font-size:30rpx; margin: 10rpx; background-color: #000000; color: #ffffff; border-radius: 15rpx">已发布:{{item.days}}天</view>
-            <view style="font-size:30rpx; margin: 10rpx; background-color: #000000; color: #ffffff; border-radius: 15rpx" data-service="{{item}}" data-index="{{index}}" @tap="updateService">修改</view>
-            <view style="font-size:30rpx; margin: 10rpx; background-color: #000000; color: #ffffff; border-radius: 15rpx" data-service="{{item}}" data-index="{{index}}" @tap="deleteService">删除</view>
-            <view style="font-size:30rpx; margin: 10rpx; background-color: #000000; color: #ffffff; border-radius: 15rpx" data-service="{{item}}" data-index="{{index}}" @tap="payPriority">{{item.leftTime ? "剩余优先"+item.leftTime:"付费优先展示"}}</view>
+        </view>
+        <view style="display: flex; flex-direction: row; background-color: #ebebeb; margin-top: 10rpx">
+          <view style="width: 650rpx; display:flex; flex-direction:column;">
+            <view style="background-color: #ebebeb; display: flex; flex-direction: row; margin-top: 10rpx">
+              <repeat for="{{item.imgArray}}" item="iitem">
+                <image src="{{iitem}}" mode="scaleToFill" style="margin: 10rpx; width: 160rpx; height: 160rpx" />
+              </repeat>
+            </view>
+            <view style="width: 100%; display: flex; flex-direction:row;">
+              <view style="font-size:30rpx; margin: 10rpx; background-color: #000000; color: #ffffff; border-radius: 15rpx">已发布:{{item.days}}天</view>
+              <view style="font-size:30rpx; margin: 10rpx; background-color: #000000; color: #ffffff; border-radius: 15rpx" data-service="{{item}}" data-index="{{index}}" @tap="updateService">修改</view>
+              <view style="font-size:30rpx; margin: 10rpx; background-color: #000000; color: #ffffff; border-radius: 15rpx" data-service="{{item}}" data-index="{{index}}" @tap="deleteService">删除</view>
+              <view style="font-size:30rpx; margin: 10rpx; background-color: #000000; color: #ffffff; border-radius: 15rpx" data-service="{{item}}" data-index="{{index}}" @tap="payPriority">{{item.leftTime ? "优先展示剩余时间"+item.leftTime:"付费优先展示"}}</view>
+            </view>
           </view>
         </view>
       </view>
