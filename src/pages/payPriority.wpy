@@ -5,8 +5,11 @@
 <template>
     <view style="display: flex; flex-direction: column; align-items: center">
         <view>说明</view>
-        <view>本广告优先展示在"{{service.basicLabelName}}"的前端</view>
-        <view>按服务提供者付费展示的申请时间先后展示</view>
+        <checkbox-group bindchange="ensuranceChange">
+        本广告优先展示在"{{service.basicLabelName}}"的前端，并按"{{service.basicLabelName}}"类中服务提供者付费优先展示所剩余天数的多少进行排序，付费后不予退款。
+        <checkbox value="{{ensurance}}" checked=""/>同意
+        </checkbox-group>
+        
         <radio-group style="margin-top: 20rpx" bindchange="radioChange">
             <view style="display: flex; flex-direction: raw; width=700rpx;  margin: 10rpx">
                 <view style="width=200rpx; font-size: 30rpx; margin: 20rpx">展示时段</view>
@@ -41,6 +44,7 @@
         }
         components = {}
         data = {
+            ensurance: false,
             service: null,
             select: 0,
             items: [{
@@ -67,6 +71,10 @@
             ]
         }
         methods = {
+            ensuranceChange(e){
+                console.log('ensure发生change事件，携带value值为：', e.detail.value)
+                this.ensurance = !this.ensurance;
+            },
             radioChange(e) {
                 console.log('radio发生change事件，携带value值为：', e.detail.value)
                 this.select = e.detail.value;
@@ -77,6 +85,13 @@
             },
             async pay() {
                 console.log(this.select);
+                if (this.ensurance !== true){
+                    wx.showToast({
+                        title: '请先同意服务协议',
+                        icon: 'none'
+                    })
+                    return;
+                }
                 let res = await wepy.request({
                     url: httpHead + httpPort + "/order/wx/jsapipay",
                     method: "POST",
@@ -95,9 +110,18 @@
                     'signType': 'MD5',
                     'paySign': res.data.sign,
                     'success': (res)=> {
+                        wx.navigateBack();
+                        wx.showToast({
+                            title: '支付成功',
+                            icon: 'none'
+                        })
                         console.log(res);
                     },
                     'fail': (res)=> {
+                        wx.showToast({
+                            title: '支付失败',
+                            icon: 'none'
+                        })
                         console.log(res);
                     }
                 })

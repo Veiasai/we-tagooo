@@ -37,7 +37,7 @@
         </repeat>
       </view>
     </view>
-    <modal wx:if="{{!showThirdLabelModal}}" title="选择具体项" bindcancel="thirdLabelCancel" bindconfirm="thirdLabelConfirm">
+    <modal wx:if="{{showThirdLabelModal}}" title="选择具体项" bindcancel="thirdLabelCancel" bindconfirm="thirdLabelConfirm">
       <radio-group class="radio-group" bindchange="thirdLabelRadioChange">
         <repeat for="{{thirdLabelList}}">
           <radio value="{{item.id}}" checked="{{item.checked}}" />{{item.type}}
@@ -67,7 +67,7 @@
       labels: labels,
       labelSelectedId: "",
       thirdLabelList: [],
-      showThirdLabelModal: true,
+      showThirdLabelModal: false,
     }
     computed = {}
     methods = {
@@ -85,10 +85,10 @@
         }
       },
       thirdLabelCancel() {
-        this.showThirdLabelModal = true;
+        this.showThirdLabelModal = false;
       },
       async thirdLabelConfirm() {
-        this.showThirdLabelModal = true;
+        this.showThirdLabelModal = false;
         let lot = this.$parent.globalData.location.longitude;
         let lat = this.$parent.globalData.location.latitude;
         try {
@@ -107,15 +107,21 @@
           }).sort((a, b) => {
             return a.distance > b.distance;
           });
+          let promises = [];
           for (let i = 0; i < services.length; i++) {
-            services[i].pic = await wepy.request({
+            promises.push(wepy.request({
               url: httpHead + httpPort + "/user/getphotoUrl",
               data: {
                 "phone": services[i].phone
               }
-            }) 
+            }))
+          }
+          res = await Promise.all(promises);
+          for (let i = 0; i < services.length; i++) {
+            services[i].pic = res[i]
             services[i].pic.data += "display"
           }
+          
           this.$parent.globalData.service = services;
           let followServices = this.$parent.globalData.followService;
           for (let i = 0; i < followServices.length; i++) {
@@ -127,6 +133,10 @@
             }
           }
           this.$apply();
+
+          if (services.length > 0){
+            this.$parent.globalData.gtype = services[0].serviceLabelName + '-' + services[0].basicLabelName
+          }
           wx.switchTab({
             url: "./findMan"
           })
@@ -143,7 +153,7 @@
         console.log(e.target);
         let item = e.currentTarget.dataset.item;
         this.thirdLabelList = item.thirdLabel;
-        this.showThirdLabelModal = false;
+        this.showThirdLabelModal = true;
       }
     }
     onShow() {

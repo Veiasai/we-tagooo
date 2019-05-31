@@ -145,6 +145,8 @@
           let res = await wepy.showModal({
             title: "确认删除",
             content: "删除操作不可撤销，确认？",
+            cancelText: "暂不删除",
+            confirmText: "确认删除"
           })
           if (res.confirm) {
             res = await wepy.request({
@@ -208,6 +210,17 @@
           }
         })
         this.services = res.data.serviceinfoDTOList;
+        console.log(this.services)
+        for (let i = 0; i < this.services.length; i++) {
+          try{
+          this.services[i].days = -moment(this.services[i].datetime, "YYYYMMDD").diff(moment(), 'days')
+          let temp = this.services[i].leftTime.split(":")
+          this.services[i].leftTime = temp[0] + "天" + temp[1] + "小时"
+          }catch(e){
+            // ignore
+          }
+        }
+        this.$apply();
         for (let i = 0; i < this.services.length; i++) {
           let res = await wepy.request({
             url: httpHead + httpPort + "/service/getpictureUrl",
@@ -222,10 +235,6 @@
           } else {
             this.services[i].imgArray = [];
           }
-          this.services[i].days = -moment(this.services[i].datetime, "YYYYMMDD").diff(moment(), 'days')
-          
-          let temp = this.services[i].leftTime.split(":")
-          this.services[i].leftTime = temp[0] + "天" + temp[1] + "小时"
         }
         console.log(this.services);
         this.$apply();

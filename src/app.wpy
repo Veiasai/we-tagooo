@@ -68,6 +68,7 @@
     }
     globalData = {
       location: null,
+      gtype: null,
       service: [],
       user: null,
       // {id: "4028815e5dd036b7015dd037e3930000"},
@@ -76,7 +77,7 @@
       userInfo: null, // wechat info
       followService: [],
       prepay_level: -1,
-      followRefresh: false,
+      followRefresh: false
     }
     constructor() {
       super();

@@ -51,7 +51,7 @@
   } from "../const/properties";
   export default class ServiceInfo extends wepy.page {
     config = {
-      navigationBarTitleText: '服务详情'
+      navigationBarTitleText: '个人页面'
     }
     components = {}
     onShareAppMessage(res) {
@@ -89,18 +89,13 @@
         }
       },
       report() {
-        wx.showModal({
-          title: '提示',
-          content: '确认举报本页吗？',
-          success(res) {
-            if (res.confirm) {
-                wx.showToast({
-                  title: '举报成功',
-                  icon: 'none'
-                })
-            } else if (res.cancel) {
-              console.log('用户点击取消')
-            }
+        wx.showActionSheet({
+          itemList: ['信息违法','信息虚假','举报内容'],
+          success (res) {
+            console.log(res.tapIndex)
+          },
+          fail (res) {
+            console.log(res.errMsg)
           }
         })
       },

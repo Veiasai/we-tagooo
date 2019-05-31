@@ -21,6 +21,8 @@
       </form>
     </view>
     <view style="margin-top: 15rpx;">
+      <view wx:if="{{services.length === 0}}">暂时没有找到您要找的人</view>
+      <view style="margin-left: 15rpx;" wx:if="{{gtype !== null}}">当前展示类{{gtype}}</view>
       <repeat for="{{services}}">
         <view style="display: flex; flex-direction: row; background-color: #ebebeb; margin-top: 20rpx; margin-left:25rpx; width: 750rpx; height: 190rpx">
           <image src="{{item.pic ? item.pic.data : '../resources/icons/default_pic.png'}}" style="width: 150rpx; height: 150rpx; margin: 20rpx" />
@@ -56,7 +58,7 @@
   } from "../const/properties";
   var QQMapWX = require('../mixins/qqmap-wx-jssdk.min.js');
   export default class FindMan extends wepy.page {
-    onLoad(param) {
+    onLoad(param, data) {
       this.qqmapsdk = new QQMapWX({
         key: 'JKNBZ-CKHAU-L6JVQ-24SIQ-A2AM2-4YFCU'
       });
@@ -68,6 +70,7 @@
           url: "./serviceInfo?id=" + param.service
         })
       }
+      
       this.getLocation();
       this.search("");
     }
@@ -76,6 +79,8 @@
         this.services = this.$parent.globalData.service;
       }
       this.location = this.$parent.globalData.location;
+      this.gtype = this.$parent.globalData.gtype;
+      console.log(this.gtype)
       this.$apply();
     }
     config = {
@@ -85,6 +90,7 @@
       location: null,
       services: [],
       qqmapsdk: null,
+      gtype: null,
     }
     methods = {
       async call(e) {
@@ -167,15 +173,31 @@
           item.distance = this.$parent.getFlatternDistance(item.latitude, item.longitude, lat, lot);
           return item;
         })  // .sort((a, b) => {return a.distance < b.distance;});
+
+        let promises = [];
         for (let i = 0; i < this.services.length; i++) {
-          this.services[i].pic = await wepy.request({
+          promises.push(wepy.request({
             url: httpHead + httpPort + "/user/getphotoUrl",
             data: {
               "phone": this.services[i].phone
             }
-          })
+          }))
+        }
+        res = await Promise.all(promises);
+        for (let i = 0; i < this.services.length; i++) {
+          this.services[i].pic = res[i]
           this.services[i].pic.data += "display"
         }
+
+        // for (let i = 0; i < this.services.length; i++) {
+        //   this.services[i].pic = await wepy.request({
+        //     url: httpHead + httpPort + "/user/getphotoUrl",
+        //     data: {
+        //       "phone": this.services[i].phone
+        //     }
+        //   })
+        //   this.services[i].pic.data += "display"
+        // }
         console.log(this.services);
         this.$parent.globalData.service = this.services
         let followServices = this.$parent.globalData.followService;
@@ -187,6 +209,7 @@
             }
           }
         }
+        this.type = null;
         this.$apply();
       } catch (e) {
         console.log(e)
