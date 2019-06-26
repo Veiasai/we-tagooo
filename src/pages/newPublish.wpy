@@ -39,23 +39,24 @@
           <image src="../resources/icons/addPicture.png" mode="scaleToFill" @tap="addImg" style="width: 160rpx; height: 160rpx; margin: 10rpx" />
         </view>
       </view>
-      <view style="background-color: #ebebeb; margin-top: 10rpx; display: flex; flex-direction: row; font-size: 32rpx">
-        <view>在广告中公开手机号码:{{phone}} </view>
-        <radio-group name="phonenum">
-          <label>
-                                    <radio value="1" checked="{{defaultPhone}}"/>
-                                    是</label>
-          <label>
-                                    <radio value="0" checked="{{!defaultPhone}}"/>
-                                    否</label>
-        </radio-group>
-      </view>
+      <!--<view style="background-color: #ebebeb; margin-top: 10rpx; display: flex; flex-direction: row; font-size: 32rpx">-->
+        <!--<view>在广告中公开手机号码:{{phone}} </view>-->
+        <!--<radio-group name="phonenum">-->
+          <!--<label>-->
+                                    <!--<radio value="1" checked="{{defaultPhone}}"/>-->
+                                    <!--是</label>-->
+          <!--<label>-->
+                                    <!--<radio value="0" checked="{{!defaultPhone}}"/>-->
+                                    <!--否</label>-->
+        <!--</radio-group>-->
+      <!--</view>-->
       <view style="margin-top: 10rpx; display: flex; flex-direction: row; align-items: center">
         <button size="mini" style="background-color: red; color: #ffffff;" formType="submit">提交</button>
         <button @tap="payPriority" size="mini" style="background-color: red; color: #ffffff; margin-left: 10rpx">付费优先展示</button>
       </view>
     </form>
-    <modal hidden="{{!showThirdLabelModal}}" title="选择分类 大类 > 中类 > 小类" bindcancel="thirdLabelCancel" bindconfirm="thirdLabelConfirm">
+    <modal hidden="{{!showThirdLabelModal}}" title="选择分类" bindcancel="thirdLabelCancel" bindconfirm="thirdLabelConfirm">
+      <view>大类 > 中类 > 小类</view>
       <view style="width: 100%; display: flex; flex-direction: row;">
         <view style="width: 30%">
           <view style="margin: 15rpx; font-size: 28rpx" data-s1="{{index}}" class="{{s1===index?'cur':''}}" wx:for="{{labels}}"  @tap="bindChange">{{item.type}}</view>
@@ -301,7 +302,7 @@
             "datetime": moment().format('YYYYMMDD'),
             "latitude": this.address.latitude,
             "longitude": this.address.longitude,
-            "phonenum": value.phonenum === '1',
+            "phonenum": true, // value.phonenum === '1',
             "pictureImageValue": imgs,
             "publishUserId": this.$parent.globalData.user.id,
             "publisherName": value.userName,

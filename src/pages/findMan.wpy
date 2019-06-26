@@ -21,8 +21,8 @@
       </form>
     </view>
     <view style="margin-top: 15rpx;">
+      <view style="margin-left: 15rpx;" wx:if="{{gtype !== null}}">{{gtype}}</view>
       <view wx:if="{{services.length === 0}}">暂时没有找到您要找的人</view>
-      <view style="margin-left: 15rpx;" wx:if="{{gtype !== null}}">当前展示类{{gtype}}</view>
       <repeat for="{{services}}">
         <view style="display: flex; flex-direction: row; background-color: #ebebeb; margin-top: 20rpx; margin-left:25rpx; width: 750rpx; height: 190rpx">
           <image src="{{item.pic ? item.pic.data : '../resources/icons/default_pic.png'}}" style="width: 150rpx; height: 150rpx; margin: 20rpx" />
@@ -70,7 +70,7 @@
           url: "./serviceInfo?id=" + param.service
         })
       }
-      
+
       this.getLocation();
       this.search("");
     }
@@ -95,16 +95,18 @@
     methods = {
       async call(e) {
         let service = e.currentTarget.dataset.service;
-        if (service.phonenum) {
-          wx.makePhoneCall({
-            phoneNumber: service.phone
-          })
-        } else {
-          wx.showToast({
-            title: '该服务未公开手机',
-            icon: 'none'
-          })
-        }
+        wx.makePhoneCall({phoneNumber: service.phone})
+
+        // if (service.phonenum) {
+        //   wx.makePhoneCall({
+        //     phoneNumber: service.phone
+        //   })
+        // } else {
+        //   wx.showToast({
+        //     title: '该服务未公开手机',
+        //     icon: 'none'
+        //   })
+        // }
       },
       async location() {
         try {
@@ -134,7 +136,7 @@
           url: "./serviceInfo"
         })
       },
-      follow(e) {
+      async follow(e) {
         if (this.$parent.globalData.user === null) {
           wepy.navigateTo({
             url: "bindPhone"
@@ -149,11 +151,18 @@
         let dataset = e.currentTarget.dataset;
         let service = dataset.service;
         if (service.follow) {
+          let res = await wepy.showModal({
+            title: "确认取消关注",
+            cancelText: "不再关注",
+            confirmText: "继续关注"
+          })
+          if (res.confirm) return;
           this.$parent.followRemove(service);
         } else {
           this.$parent.follow(service);
         }
         this.services[dataset.index].follow = !service.follow;
+        this.$apply()
       }
     }
     async search(value) {
