@@ -67,10 +67,10 @@
         }
         let res = await wepy.showModal({
             title: "确认取消关注",
-            cancelText: "不再关注",
-            confirmText: "继续关注"
+            cancelText: "继续关注",
+            confirmText: "不再关注"
         })
-        if (res.confirm) return;
+        if (!res.confirm) return;
         console.log(e);
         let dataset = e.currentTarget.dataset;
         this.$parent.followRemove(dataset.service);
