@@ -4,14 +4,13 @@
 
 <template>
     <view style="display: flex; flex-direction: column; align-items: center">
-        <view>说明</view>
         <checkbox-group bindchange="ensuranceChange">
         在搜索“{{service.basicLabelName}}”后、本广告优先展示在“找到的人”的前端。
         如有其它优先展示付费者，则按照付费优先展示所剩余天数从多到少的次序进行展示。
         付费后不予退款。
         <checkbox value="{{ensurance}}" checked=""/>同意
         </checkbox-group>
-        
+
         <radio-group style="margin-top: 20rpx" bindchange="radioChange">
             <view style="display: flex; flex-direction: raw; width=700rpx;  margin: 10rpx">
                 <view style="width=200rpx; font-size: 30rpx; margin: 20rpx">展示天数</view>

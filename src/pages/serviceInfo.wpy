@@ -40,6 +40,16 @@
       <button wx:if="{{report}}" style="border: solid; width: 50%; border-radius: 10rpx; border-color: #ebebeb" size="mini" @tap="report">举报
                     </button>
     </view>
+    <modal hidden="{{!showReportModal}}" title="举报" bindcancel="reportCancel" bindconfirm="reportConfirm">
+      <checkbox-group bindchange="">
+        <label class="checkbox" wx:for="{{reports}}">
+          <checkbox value="{{item.value}}" checked="{{item.checked}}"/>{{item.name}}
+        </label>
+      </checkbox-group>
+      <view style="background-color: #ebebeb; height: 30vh; margin-top: 10rpx">
+        <textarea value="" name="slogan" placeholder="举报内容" />
+      </view>
+    </modal>
   </view>
 </template>
 
@@ -72,6 +82,11 @@
       follow: true,
       id: null,
       back: 0,
+      reports: [
+        {name: '信息虚假', value: '0'},
+        {name: '信息违法', value: '1'},
+      ],
+      showReportModal: false,
     }
     computed = {}
     methods = {
@@ -89,15 +104,17 @@
         }
       },
       report() {
-        wx.showActionSheet({
-          itemList: ['信息违法','信息虚假','举报内容'],
-          success (res) {
-            console.log(res.tapIndex)
-          },
-          fail (res) {
-            console.log(res.errMsg)
-          }
+        this.showReportModal = true
+      },
+      reportCancel() {
+        this.showReportModal = false;
+      },
+      reportConfirm() {
+        wx.showToast({
+          title: '举报成功',
+          icon: 'none'
         })
+        this.showReportModal = false;
       },
       follow() {
         if (this.$parent.globalData.user === null) {
@@ -152,7 +169,7 @@
         });
         console.log(res)
       } catch (e) {
-        
+
       }
 
       // prepay
@@ -210,7 +227,7 @@
           url: httpHead + httpPort + "/user/getphotoUrl",
           data: {
             "phone": service.phone
-          } 
+          }
         })
         service.pic.data += "display"
         return service;

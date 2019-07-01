@@ -40,7 +40,7 @@
     <modal wx:if="{{showThirdLabelModal}}" title="选择具体项" bindcancel="thirdLabelCancel" bindconfirm="thirdLabelConfirm">
       <radio-group class="radio-group" bindchange="thirdLabelRadioChange">
         <repeat for="{{thirdLabelList}}">
-          <radio value="{{item.id}}" checked="{{item.checked}}" />{{item.type}}
+          <radio value="{{item.id + ' ' + item.serviceTypeId + ' ' + item.type}}" checked="{{item.checked}}" />{{item.type}}
         </repeat>
       </radio-group>
     </modal>
@@ -121,7 +121,7 @@
             services[i].pic = res[i]
             services[i].pic.data += "display"
           }
-          
+
           this.$parent.globalData.service = services;
           let followServices = this.$parent.globalData.followService;
           for (let i = 0; i < followServices.length; i++) {
@@ -134,9 +134,6 @@
           }
           this.$apply();
 
-          if (services.length > 0){
-            this.$parent.globalData.gtype = services[0].serviceLabelName + '-' + services[0].basicLabelName
-          }
           wx.switchTab({
             url: "./findMan"
           })
@@ -145,9 +142,14 @@
         }
       },
       thirdLabelRadioChange(e) {
-        let id = e.detail.value;
-        this.labelSelectedId = id;
-        console.log(id);
+        let it = e.detail.value.split(" ");
+        this.labelSelectedId = it[0];
+        labels.forEach((value, index, array)=>{
+          let t = value.serviceLabel.find((serviceLabel) => serviceLabel.id == it[1])
+          if (t !== undefined){
+            this.$parent.globalData.gtype = value.type + '-' + t.type + '-' + it[2]
+          }
+        })
       },
       open(e) {
         console.log(e.target);
