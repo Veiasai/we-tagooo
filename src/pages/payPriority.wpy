@@ -5,10 +5,12 @@
 <template>
     <view style="display: flex; flex-direction: column; align-items: center">
         <checkbox-group bindchange="ensuranceChange">
+        <view >
         在搜索“{{service.basicLabelName}}”后、本广告优先展示在“找到的人”的前端。
         如有其它优先展示付费者，则按照付费优先展示所剩余天数从多到少的次序进行展示。
+        </view>
         付费后不予退款。
-        <checkbox value="{{ensurance}}" checked=""/>同意
+        <checkbox style="margin-left: 200rpx" value="{{ensurance}}" checked=""/>同意
         </checkbox-group>
 
         <radio-group style="margin-top: 20rpx" bindchange="radioChange">
@@ -49,7 +51,7 @@
             service: null,
             select: 0,
             items: [{
-                    time: '一周',
+                    time: '7天',
                     pay: 80,
                     checked: true,
                 },
@@ -111,6 +113,11 @@
                     'signType': 'MD5',
                     'paySign': res.data.sign,
                     'success': (res)=> {
+                        let pages = getCurrentPages();
+                        let prevPage = pages[pages.length - 2];
+                        prevPage.setData({
+                            refresh:1,
+                        }) 
                         wx.navigateBack();
                         wx.showToast({
                             title: '支付成功',

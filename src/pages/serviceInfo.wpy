@@ -124,12 +124,17 @@
           })
           return;
         }
+
         if (this.service.follow) {
           this.$parent.followRemove(this.service);
         } else {
           this.$parent.follow(this.service);
         }
         this.service.follow = !this.service.follow;
+        let pages = getCurrentPages();
+        let prevPage = pages[pages.length - 2];
+        prevPage.setData({followChangeIndex: this.index, followChangeState: this.service.follow})
+        this.$parent.globalData.followRefresh = true;
       },
       preview(event) {
         let src = event.currentTarget.dataset.src;
@@ -152,8 +157,9 @@
       console.log("param", param);
       this.back = param.back;
       this.service = data.preload.service;
+      this.index = data.preload.index;
       this.report = data.preload.report;
-      this.follow = data.preload.follow;
+      this.follow = this.service.follow;
       if (param.id !== undefined) {
         this.service = await this.findById(param.id)
       }

@@ -56,7 +56,7 @@
       </view>
     </form>
     <modal hidden="{{!showThirdLabelModal}}" title="选择分类" bindcancel="thirdLabelCancel" bindconfirm="thirdLabelConfirm">
-      <view>大类 > 中类 > 小类</view>
+      <view style="margin-left: 125rpx">大类 > 中类 > 小类</view>
       <view style="width: 100%; display: flex; flex-direction: row;">
         <view style="width: 30%">
           <view style="margin: 15rpx; font-size: 28rpx" data-s1="{{index}}" class="{{s1===index?'cur':''}}" wx:for="{{labels}}"  @tap="bindChange">{{item.type}}</view>

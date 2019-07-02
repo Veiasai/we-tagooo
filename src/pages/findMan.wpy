@@ -75,8 +75,14 @@
       this.search("");
     }
     onShow() {
+      let pages = getCurrentPages();
+      let currPage = pages[pages.length - 1];
       if (this.$parent.globalData.service !== null) {
         this.services = this.$parent.globalData.service;
+      }
+      if (currPage.data.followChangeIndex !== -1){
+        this.services[currPage.data.followChangeIndex].follow = currPage.data.followChangeState;
+        currPage.setData({followChangeIndex: -1});
       }
       this.location = this.$parent.globalData.location;
       this.gtype = this.$parent.globalData.gtype;
@@ -91,6 +97,8 @@
       services: [],
       qqmapsdk: null,
       gtype: null,
+      followChangeIndex: -1,
+      followChangeState: 0, 
     }
     methods = {
       async call(e) {
@@ -156,13 +164,14 @@
             cancelText: "不再关注",
             confirmText: "继续关注"
           })
-          if (res.confirm) return;
+          if (res.confirm) return -1;
           this.$parent.followRemove(service);
         } else {
           this.$parent.follow(service);
         }
         this.services[dataset.index].follow = !service.follow;
         this.$apply()
+        return 0
       }
     }
     async search(value) {

@@ -74,6 +74,7 @@
       userName: "",
       userImg: "",
       userAddress: "",
+      refresh: 0
     }
     methods = {
       async serviceInfo(e) {
@@ -174,6 +175,18 @@
         this.$navigate({
           url: "./payPriority"
         })
+      }
+    }
+    onShow(){
+      let pages = getCurrentPages();
+      let currPage = pages[pages.length - 1];
+      if (currPage.data.refresh === 1){
+        currPage.data.refresh = 0;
+        this.phone = this.$parent.globalData.user.phone;
+        this.userImg = this.$parent.globalData.user.photo + "display";
+        this.userName = this.$parent.globalData.user.name;
+        this.userAddress = this.$parent.globalData.user.address;
+        this.findUserService(this.$parent.globalData.user.id); 
       }
     }
     onLoad() {
