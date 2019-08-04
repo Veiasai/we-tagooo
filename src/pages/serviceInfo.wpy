@@ -35,9 +35,9 @@
     </view>
     <view style="width:100%; font-size: 30rpx; background-color: #ebebeb; margin-top: 25rpx">发布日期：{{service.datetime}}</view>
     <view style="display: flex; flex-direction: row; margin-top: 20rpx; width: 100%">
-      <button style="border: solid; width: 50%; border-radius: 10rpx; border-color: #ebebeb" open-type="share" size="mini">分享本页
+      <button style="border: solid; width: 50%; border-radius: 10rpx; border-color: #ebebeb; background-color: red; color: #ffffff;" open-type="share" size="mini">分享本页
                     </button>
-      <button wx:if="{{report}}" style="border: solid; width: 50%; border-radius: 10rpx; border-color: #ebebeb" size="mini" @tap="report">举报
+      <button wx:if="{{report}}" style="border: solid; width: 50%; border-radius: 10rpx; border-color: #ebebeb; background-color: red; color: #ffffff;" size="mini" @tap="report">举报
                     </button>
     </view>
     <modal hidden="{{!showReportModal}}" title="举报" bindcancel="reportCancel" bindconfirm="reportConfirm">

@@ -103,17 +103,14 @@
         this.defaultTitle = service.title;
         this.defaultSlogan = service.slogan;
         this.defaultPhone = service.phonenum;
-        this.imgArray = service.imgArray.map((item) => {
-          return item.picture;
-        });
+        this.imgArray = service.imgArray;
         let res = await wepy.request({
           url: httpHead + httpPort + "/user/getphotoUrl",
           data: {
             phone: this.phone
           }
         })
-        res.data += "display"
-        this.userImg = res.data;
+        this.userImg = res.data + "display";
         this.$apply();
         console.log(this.id);
       } catch (e) {

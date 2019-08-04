@@ -14,8 +14,8 @@
           <view style="border: solid;border-color: dimgrey; width: 500rpx; border-width: 3rpx; border-radius: 20rpx; margin-left:20rpx">
             <input name="name" placeholder="关键词查找" />
           </view>
-          <view style="height: 60rpx; margin-left: 15rpx; border-radius: 20rpx">
-            <button size="mini" style="font-size:30rpx; " formType="submit">查找</button>
+          <view style="height: 60rpx; margin-left: 15rpx; border-radius: 20rpx; border-width: 2rpx; border-color: red;">
+            <button size="mini" style="font-size:30rpx; background-color: red; color: #ffffff;" formType="submit">查找</button>
           </view>
         </view>
       </form>
@@ -162,7 +162,8 @@
           let res = await wepy.showModal({
             title: "确认取消关注",
             cancelText: "不再关注",
-            confirmText: "继续关注"
+            confirmText: "继续关注",
+            confirmColor: "#000000",
           })
           if (res.confirm) return -1;
           this.$parent.followRemove(service);
