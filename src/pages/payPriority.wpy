@@ -26,12 +26,13 @@
                 </view>
             </repeat>
         </radio-group>
-        <button wx:if="{{service.id === undefined}}" @tap="confirm" >
+        <button wx:if="{{service.id === undefined}}" stayle="background-color: red; color: #ffffff;" @tap="confirm" >
                 确认选择
                 </button>
-        <button wx:if="{{service.id}}" @tap="pay">
+        <button wx:if="{{service.id}}" style="background-color: red; color: #ffffff;" @tap="pay">
                 微信支付
-            </button>
+                </button>
+ 
     </view>
 </template>
 
@@ -88,12 +89,33 @@
             },
             async pay() {
                 console.log(this.select);
+
                 if (this.ensurance !== true){
                     wx.showToast({
                         title: '请先同意服务协议',
                         icon: 'none'
                     })
                     return;
+                }
+                try {
+                    let res = await wepy.chooseInvoiceTitle();   
+                    console.log(res);
+                }catch(res){
+                    if (res.errMsg === 'chooseInvoiceTitle:fail cancel'){
+                        wx.showToast({
+                            title: '请选择发票抬头',
+                            icon: 'none'
+                        })
+                        return;
+                    }else{
+                        wx.showToast({
+                            title: '请授权发票抬头信息获取',
+                            icon: 'none'
+                        })
+                        wx.openSetting()
+                        return;
+                    }
+                    
                 }
                 let res = await wepy.request({
                     url: httpHead + httpPort + "/order/wx/jsapipay",

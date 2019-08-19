@@ -5,11 +5,11 @@
 <template>
   <view style="text-align: center">
     <view style="display: flex; flex-direction: row; ">
-      <button wx:if="{{!phone}}" style="border: solid; width: 100%; border-radius: 10rpx; border-color: aliceblue" open-type="getUserInfo" size="mini" @tap="bindPhone">请登录
+      <button wx:if="{{!phone}}" style="border: solid; width: 100%; border-radius: 10rpx; border-color: aliceblue; background-color: red; color: #ffffff;" open-type="getUserInfo" size="mini" @tap="bindPhone">请登录
                   </button>
-      <button wx:if="{{phone}}" style="border: solid; width: 100%; border-radius: 10rpx; border-color: aliceblue" size="mini" @tap="newPublish">发布新广告
+      <button wx:if="{{phone}}" style="border: solid; width: 100%; border-radius: 10rpx; border-color: aliceblue; background-color: red; color: #ffffff;" size="mini" @tap="newPublish">发布新广告
                   </button>
-      <button style="border: solid; width: 100%; border-radius: 10rpx; border-color: aliceblue" size="mini" open-type="contact" >联系客服</button>
+      <button style="border: solid; width: 100%; border-radius: 10rpx; border-color: aliceblue; background-color: red; color: #ffffff;" size="mini" open-type="contact" >联系客服</button>
     </view>
     <!-- TODO: avatar,  -->
     <view wx:if="{{phone}}" style="display: flex; flex-direction: row; margin-left: 5%; border: solid; width: 90%; border-radius: 10rpx; border-color: darkgrey; border-width: 2rpx;">
@@ -147,7 +147,8 @@
             title: "确认删除",
             content: "删除该服务广告",
             cancelText: "暂不删除",
-            confirmText: "确认删除"
+            confirmText: "确认删除",
+            confirmColor: "#000000",
           })
           if (res.confirm) {
             res = await wepy.request({

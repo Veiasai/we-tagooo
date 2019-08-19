@@ -39,7 +39,7 @@
     </view>
     <modal wx:if="{{showThirdLabelModal}}" title="选择具体项" bindcancel="thirdLabelCancel" bindconfirm="thirdLabelConfirm">
       <radio-group class="radio-group" bindchange="thirdLabelRadioChange">
-        <repeat for="{{thirdLabelList}}">
+        <repeat class="radio" for="{{thirdLabelList}}">
           <radio value="{{item.id + ' ' + item.serviceTypeId + ' ' + item.type}}" checked="{{item.checked}}" />{{item.type}}
         </repeat>
       </radio-group>
