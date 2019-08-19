@@ -52,7 +52,7 @@
       <!--</view>-->
       <view style="margin-top: 10rpx; display: flex; flex-direction: row; align-items: center">
         <button size="mini" style="background-color: red; color: #ffffff;" formType="submit">提交</button>
-        <button @tap="payPriority" size="mini" style="background-color: red; color: #ffffff; margin-left: 10rpx">付费优先展示</button>
+        <!-- <button @tap="payPriority" size="mini" style="background-color: red; color: #ffffff; margin-left: 10rpx">付费优先展示</button> -->
       </view>
     </form>
     <modal hidden="{{!showThirdLabelModal}}" title="选择分类" bindcancel="thirdLabelCancel" bindconfirm="thirdLabelConfirm">
