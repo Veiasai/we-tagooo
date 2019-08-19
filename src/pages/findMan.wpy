@@ -35,13 +35,14 @@
           </view>
           <view style="width: 200rpx; display: flex; flex-direction:column; align-items: right">
             <view style="margin-top:10rpx; font-size: 27rpx">{{item.distance}}千米</view>
-            <view style="display: flex; flex-direction: row;">
-              <!-- <view style="margin-top:10rpx; font-size: 27rpx;">{{item.certification ? '工商户认证' : '未认证'}}</view> -->
-              <!-- <image mode="aspectFit" style="width: 40rpx; height: 38rpx" src='../resources/icons/auth.png' /> -->
-            </view>
             <view @tap="follow" data-service="{{item}}" data-index="{{index}}" style="margin-top:10rpx; display: flex; align-items: center">
               <view style="font-size: 27rpx;">关注</view>
               <image mode="aspectFit" style="width: 40rpx; height: 38rpx" src="{{item.follow ? '../resources/icons/follow-2.png' : '../resources/icons/follow-1.png'}}" />
+            </view>
+            <view wx:if="{{item.is_paying}}" style="margin-top:10rpx; display: flex; flex-direction: row;">
+              <view  style="font-size: 27rpx;">付费广告</view>
+              <!-- <view style="margin-top:10rpx; font-size: 27rpx;">{{item.certification ? '工商户认证' : '未认证'}}</view> -->
+              <image mode="aspectFit" style="width: 40rpx; height: 38rpx" src='../resources/icons/vip.png' />
             </view>
           </view>
         </view>
