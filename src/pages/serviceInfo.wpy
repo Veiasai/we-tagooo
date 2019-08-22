@@ -116,7 +116,7 @@
         })
         this.showReportModal = false;
       },
-      follow() {
+      async follow() {
         if (this.$parent.globalData.user === null) {
           wx.showToast({
             title: '尚未登陆,功能受限',
@@ -126,6 +126,13 @@
         }
 
         if (this.service.follow) {
+          let res = await wepy.showModal({
+            title: "确认取消关注",
+            cancelText: "不再关注",
+            confirmText: "继续关注",
+            confirmColor: "#000000",
+          })
+          if (res.confirm) return -1;
           this.$parent.followRemove(this.service);
         } else {
           this.$parent.follow(this.service);
@@ -135,6 +142,7 @@
         let prevPage = pages[pages.length - 2];
         prevPage.setData({followChangeIndex: this.index, followChangeState: this.service.follow})
         this.$parent.globalData.followRefresh = true;
+        this.$apply();
       },
       preview(event) {
         let src = event.currentTarget.dataset.src;

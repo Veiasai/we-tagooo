@@ -7,7 +7,7 @@
     <view style="display: flex; flex-direction: row; ">
       <button wx:if="{{!phone}}" style="border: solid; width: 100%; border-radius: 10rpx; border-color: aliceblue; background-color: red; color: #ffffff;" open-type="getUserInfo" size="mini" @tap="bindPhone">请登录
                   </button>
-      <button wx:if="{{phone}}" style="border: solid; width: 100%; border-radius: 10rpx; border-color: aliceblue; background-color: red; color: #ffffff;" size="mini" @tap="newPublish">发布新广告
+      <button wx:if="{{phone}}" style="border: solid; width: 100%; border-radius: 10rpx; border-color: aliceblue; background-color: red; color: #ffffff;" size="mini" @tap="newPublish">发新广告
                   </button>
       <button style="border: solid; width: 100%; border-radius: 10rpx; border-color: aliceblue; background-color: red; color: #ffffff;" size="mini" open-type="contact" >联系客服</button>
     </view>

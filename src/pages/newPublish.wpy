@@ -50,6 +50,14 @@
                                     <!--否</label>-->
         <!--</radio-group>-->
       <!--</view>-->
+      <view style="margin-top: 10rpx; margin-left: 175rpx; font-size: 32rpx; align-items: center">
+        <view>
+          您的登陆手机号{{phone}}
+        </view>
+        <view>
+          将在广告中公开给用户联系您
+        </view>
+      </view>
       <view style="margin-top: 10rpx; display: flex; flex-direction: row; align-items: center">
         <button size="mini" style="background-color: red; color: #ffffff;" formType="submit">提交</button>
         <!-- <button @tap="payPriority" size="mini" style="background-color: red; color: #ffffff; margin-left: 10rpx">付费优先展示</button> -->
@@ -85,8 +93,24 @@
   export default class newPublish extends wepy.page {
     async onLoad(param, data) {
       this.$parent.globalData.prepay_level = -1;
+
+      this.phone = this.$parent.globalData.user.phone;
+      let res = await wepy.request({
+          url: httpHead + httpPort + "/user/getphotoUrl",
+          data: {
+            phone: this.phone
+          }
+        })
+      this.userImg = res.data + "display";
+      this.defaultName = this.$parent.globalData.user.name; 
+      this.address = {
+          address: this.$parent.globalData.location.name,
+          name: "",
+          latitude: this.$parent.globalData.location.latitude,
+          longitude: this.$parent.globalData.location.longitude
+        };
+
       try {
-        this.phone = this.$parent.globalData.user.phone;
         let service = data.preload.service;
         this.id = service.id;
         this.label = {
@@ -104,20 +128,14 @@
         this.defaultSlogan = service.slogan;
         this.defaultPhone = service.phonenum;
         this.imgArray = service.imgArray;
-        let res = await wepy.request({
-          url: httpHead + httpPort + "/user/getphotoUrl",
-          data: {
-            phone: this.phone
-          }
-        })
-        this.userImg = res.data + "display";
-        this.$apply();
         console.log(this.id);
       } catch (e) {
         this.id = null;
         console.log(e);
       }
+      this.$apply();
     }
+    
     config = {
       navigationBarTitleText: '发布服务',
     }
