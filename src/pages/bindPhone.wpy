@@ -153,6 +153,13 @@
               "photoImageValue": this.$parent.globalData.userInfo.avatarUrl,
             }
           })
+          try {
+            let pages = getCurrentPages();
+            let lastPage = pages[pages.length - 2];
+            lastPage.data.refresh = 1;
+          } catch(e) {
+            console.log(e)
+          }
           wx.navigateBack();
         } else if (res.data.status === 403) {
           wx.showToast({
