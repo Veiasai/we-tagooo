@@ -73,7 +73,6 @@ checkbox .wx-checkbox-input.wx-checkbox-input-checked::before{
         'pages/bindPhone',
         'pages/serviceInfo',
         'pages/newPublish',
-        'pages/payPriority',
         'pages/userAgreement',
       ],
       window: {
@@ -138,6 +137,10 @@ checkbox .wx-checkbox-input.wx-checkbox-input-checked::before{
       this.use('promisify');
     }
     onLaunch() {
+      wepy.showLoading({
+        title: '加载中',
+        mask: true
+      })
       this.userState = 1;
       this.login();
     }
@@ -228,7 +231,7 @@ checkbox .wx-checkbox-input.wx-checkbox-input-checked::before{
         let res = await wepy.getUserInfo();
         this.globalData.userInfo = res.userInfo;
       } catch (e) {
-        return;
+
       }
       try {
         let res = await wepy.login();
@@ -257,6 +260,7 @@ checkbox .wx-checkbox-input.wx-checkbox-input-checked::before{
       } catch (e) {
         console.log(e);
       }
+      wepy.hideLoading();
     }
   }
 </script>

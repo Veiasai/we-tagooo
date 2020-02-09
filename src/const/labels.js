@@ -758,7 +758,7 @@ var savedLabels = [
 			},
 			{
 				"id":"4028815e5dd03716015f292938f700a1",
-				"type":"保健医疗",
+				"type":"医疗",
 				"basicTypeId":"4028815e5dd03716015f2928ec00009f",
 				"thirdLabel":[
 					{
